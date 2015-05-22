@@ -1,7 +1,9 @@
-DL4J Examples (based on version 0.0.3.3)
+DL4J Examples 
 =========================
+* (based on version 0.0.3.3) *
 
-Repository of Deeplearning4J the following neural net examples.
+
+Repository of Deeplearning4J neural net examples:
 
 - Convolutional Neural Nets
 - Deep-belief Neural Nets
