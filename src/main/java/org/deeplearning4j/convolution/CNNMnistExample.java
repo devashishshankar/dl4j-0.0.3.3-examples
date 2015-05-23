@@ -38,8 +38,8 @@ public class CNNMnistExample {
 
         final int numRows = 28;
         final int numColumns = 28;
-        int batchSize = 50;
-        int numSamples = 500;
+        int batchSize = 1000;
+        int numSamples = 10000;
         double numTrainSamples = numSamples * 0.8;
 
         log.info("Load data....");
