@@ -1,6 +1,6 @@
 DL4J Examples 
 =========================
-* (based on version 0.0.3.3) *
+*(based on version 0.0.3.3)*
 
 
 Repository of Deeplearning4J neural net examples:
