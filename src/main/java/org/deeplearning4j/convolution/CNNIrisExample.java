@@ -47,14 +47,14 @@ public class CNNIrisExample {
                 .dropOut(0.5)
                 .list(2)
                 .preProcessor(1, new ConvolutionPostProcessor()).inputPreProcessor(0, new ConvolutionInputPreProcessor(numRows, numColumns))
-                .hiddenLayerSizes(new int[]{9})
+                .hiddenLayerSizes(9)
                 .override(0, new ConfOverride() {
                     public void overrideLayer(int i, NeuralNetConfiguration.Builder builder) {
                         builder.layer(new ConvolutionLayer());
                         builder.convolutionType(ConvolutionLayer.ConvolutionType.MAX);
                         builder.featureMapSize(2, 2);
                     }
-                }).override(1, new ClassifierOverride(1))
+                }).override(1, new ClassifierOverride())
                 .build();
 
         //Create a neural net from the configuration

@@ -56,8 +56,8 @@ public class DBNCreateDataExample {
                 .lossFunction(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
                 .learningRate(1e-1f)
                 .optimizationAlgo(OptimizationAlgorithm.ITERATION_GRADIENT_DESCENT)
-                .list(2).hiddenLayerSizes(new int[]{400})
-                .override(new ClassifierOverride(3))
+                .list(2).hiddenLayerSizes(400)
+                .override(1,new ClassifierOverride(3))
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
 

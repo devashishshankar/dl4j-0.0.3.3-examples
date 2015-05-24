@@ -68,7 +68,7 @@ public class CNNMnistExample {
                     public void overrideLayer(int i, NeuralNetConfiguration.Builder builder) {
                         builder.layer(new SubsamplingLayer());
                     }
-                }).override(2, new ClassifierOverride(2))
+                }).override(2, new ClassifierOverride())
                 .build();
         MultiLayerNetwork network = new MultiLayerNetwork(conf);
         network.init();

@@ -40,7 +40,7 @@ public class DBNLWFExample {
                 .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
                 .learningRate(1e-3f)
                 .list(4).hiddenLayerSizes(new int[]{600, 250, 200})
-                .override(new ClassifierOverride(3))
+                .override(3,new ClassifierOverride())
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.setListeners(Arrays.asList((IterationListener) new NeuralNetPlotterIterationListener(1)));

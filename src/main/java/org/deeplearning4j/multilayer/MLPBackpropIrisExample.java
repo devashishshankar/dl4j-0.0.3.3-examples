@@ -63,7 +63,7 @@ public class MLPBackpropIrisExample {
                 .optimizationAlgo(OptimizationAlgorithm.LBFGS).constrainGradientToUnitNorm(true)
                 .list(2).hiddenLayerSizes(new int[]{3})
                 .backward(true)
-                .override(new ClassifierOverride(1))
+                .override(1,new ClassifierOverride(1))
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();

@@ -61,8 +61,8 @@ public class DBNIrisExample {
                 .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
                 .learningRate(1e-1f).momentum(0.9).regularization(true).l2(2e-4)
                 .optimizationAlgo(OptimizationAlgorithm.LBFGS).constrainGradientToUnitNorm(true)
-                .list(2).hiddenLayerSizes(new int[]{3})
-                .override(new ClassifierOverride(1))
+                .list(2).hiddenLayerSizes(3)
+                .override(1,new ClassifierOverride(1))
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();

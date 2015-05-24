@@ -8,6 +8,7 @@ import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.layers.RBM;
+import org.deeplearning4j.nn.conf.override.ClassifierOverride;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -34,7 +35,7 @@ public class DBNSmallMnistExample {
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .layer(new RBM()).nIn(784).nOut(10).weightInit(WeightInit.VI).iterations(5)
                 .lossFunction(LossFunctions.LossFunction.RMSE_XENT).learningRate(1e-1f)
-                .list(4).hiddenLayerSizes(new int[]{600, 500, 400})
+                .list(4).hiddenLayerSizes(new int[]{600, 500, 400}).override(3,new ClassifierOverride())
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
 

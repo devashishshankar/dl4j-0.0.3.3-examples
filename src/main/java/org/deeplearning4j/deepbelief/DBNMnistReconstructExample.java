@@ -37,7 +37,7 @@ public class DBNMnistReconstructExample {
                 .layer(new RBM()).nIn(784).nOut(10).weightInit(WeightInit.VI).iterations(5)
                 .lossFunction(LossFunctions.LossFunction.RMSE_XENT).learningRate(1e-1f)
                 .list(4).hiddenLayerSizes(new int[]{600, 500, 400})
-                .override(new ClassifierOverride(3))
+                .override(3,new ClassifierOverride())
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
 
