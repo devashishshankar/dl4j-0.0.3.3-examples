@@ -47,7 +47,7 @@ public class DBNFullMnistExample {
                 .momentum(0.5).momentumAfter(Collections.singletonMap(3, 0.9))
                 .optimizationAlgo(OptimizationAlgorithm.CONJUGATE_GRADIENT)
                 .list(4).hiddenLayerSizes(new int[]{500, 250, 200})
-                .override(new ClassifierOverride(3))
+                .override(3,new ClassifierOverride(3))
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
