@@ -3,14 +3,14 @@
 
     <groupId>org.deeplearning4j</groupId>
     <artifactId>deeplearning4j-examples</artifactId>
-    <version>0.0.3.3.3-SNAPSHOT</version>
+    <version>0.0.3.3.4-SNAPSHOT</version>
 
     <name>DeepLearning4j Examples</name>
     <description>Examples of training different data sets</description>
     <properties>
         <nd4j.version>0.0.3.5.5.4-SNAPSHOT</nd4j.version>
         <dl4j.version>0.0.3.3.4.alpha1-SNAPSHOT</dl4j.version>
-        <canova.version>0.0.0.2</canova.version>
+        <canova.version>0.0.0.3-SNAPSHOT</canova.version>
 
     </properties>
 
