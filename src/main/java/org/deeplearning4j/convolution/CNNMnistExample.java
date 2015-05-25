@@ -38,14 +38,15 @@ public class CNNMnistExample {
 
         final int numRows = 28;
         final int numColumns = 28;
-        int batchSize = 50;
-        int numSamples = 500;
+        int batchSize = 100;
+        int numSamples = 10000;
         double numTrainSamples = numSamples * 0.8;
 
         log.info("Load data....");
         DataSetIterator mnist = new MnistDataSetIterator(numSamples,numSamples); // TODO there are 60k avail
         DataSet allMnist = mnist.next();
         allMnist.normalizeZeroMeanZeroUnitVariance();
+//        allMnist.normalize();
 
         log.info("Split data....");
         SplitTestAndTrain trainTest = allMnist.splitTestAndTrain(((int) numTrainSamples)); // train set that is the result - should flip // TODO put back to 80% of data
@@ -64,7 +65,7 @@ public class CNNMnistExample {
                 .activationFunction("sigmoid").filterSize(30, 1, numRows, numColumns)
                 .lossFunction(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD).learningRate(0.13)
                 .optimizationAlgo(OptimizationAlgorithm.GRADIENT_DESCENT).constrainGradientToUnitNorm(true)
-                .list(3).hiddenLayerSizes(new int[]{72})
+                .list(3).hiddenLayerSizes(72)
                 .inputPreProcessor(0, new ConvolutionInputPreProcessor(numRows, numColumns)).preProcessor(1, new ConvolutionPostProcessor())
                 .override(0, new ConfOverride() {
                     public void overrideLayer(int i, NeuralNetConfiguration.Builder builder) {
@@ -76,7 +77,7 @@ public class CNNMnistExample {
                     public void overrideLayer(int i, NeuralNetConfiguration.Builder builder) {
                         builder.layer(new SubsamplingLayer());
                     }
-                }).override(2, new ClassifierOverride())
+                }).override(2, new ClassifierOverride(2))
                 .build();
         MultiLayerNetwork network = new MultiLayerNetwork(conf);
         network.init();
