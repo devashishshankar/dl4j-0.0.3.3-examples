@@ -60,8 +60,12 @@ public class DBNFullMnistExample {
         }
         iter.reset();
 
+        // model.fit(iter) // alternate approach that does end-to-end training before fine tuning
+
         log.info("Evaluate model....");
         Evaluation eval = new Evaluation();
+
+
         while(iter.hasNext()) {
             DataSet d2 = iter.next();
             INDArray predict2 = model.output(d2.getFeatureMatrix());
