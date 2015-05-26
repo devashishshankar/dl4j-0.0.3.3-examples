@@ -1,6 +1,5 @@
 package org.deeplearning4j.convolution;
 
-import org.deeplearning4j.datasets.fetchers.MnistDataFetcher;
 import org.deeplearning4j.datasets.iterator.SamplingDataSetIterator;
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
@@ -17,9 +16,11 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.dataset.SplitTestAndTrain;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
@@ -33,70 +34,125 @@ import java.util.Arrays;
 public class CNNMnistExample {
 
     private static final Logger log = LoggerFactory.getLogger(CNNMnistExample.class);
+    private static final int numRows = 28;
+    private static final int numColumns = 28;
 
-    public static void main(String[] args) throws Exception {
+    @Option(name="-samples", usage="number of samples to get")
+    private static int numSamples = 100;
 
-        final int numRows = 28;
-        final int numColumns = 28;
-        int batchSize = 100;
-        int numSamples = 1000;
-        double numTrainSamples = numSamples * 0.8;
+    @Option(name="-batch", usage="batch size for training" )
+    private static int batchSize = 10;
 
-        log.info("Load data....");
-        DataSetIterator mnist = new MnistDataSetIterator(numSamples,numSamples); // TODO there are 60k avail
-        DataSet allMnist = mnist.next();
-        allMnist.normalizeZeroMeanZeroUnitVariance();
-//        allMnist.normalize();
+    @Option(name="-featureMap", usage="size of feature map. Just enter single value")
+    int featureMapSize = 5;
 
-        log.info("Split data....");
-        SplitTestAndTrain trainTest = allMnist.splitTestAndTrain(((int) numTrainSamples)); // train set that is the result - should flip // TODO put back to 80% of data
-        DataSet trainInput = trainTest.getTrain(); // get feature matrix and labels for training
-        INDArray testInput = trainTest.getTest().getFeatureMatrix();
-        INDArray testLabels = trainTest.getTest().getLabels();
+    @Option(name="-learningRate", usage="learning rate")
+    private static double learningRate = 0.10;
 
-        DataSetIterator trainDataSetIterator = new SamplingDataSetIterator(trainInput, batchSize, (int) numTrainSamples);
+    @Option(name="-activate", usage="activation function")
+    private static String activationFunc="sigmoid";
 
-        log.info("Build model....");
-        // TODO iterations back to 10
-        // TODO try the if then without the input and preprocess for all layers
+    @Option(name="-loss", usage="loss function")
+    private static LossFunctions.LossFunction lossFunc = LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD;
+
+    @Option(name="-hLayerSize", usage="hidden layer size")
+    private static int hLayerSize = 18;
+
+    private static double numTrainSamples = numSamples * 0.8;
+    private static double numTestSamples = numSamples - numTrainSamples;
+
+    static DataSetIterator loadData(int numTrainSamples) throws Exception{
+        //SamplingDataSetIterator - TODO make sure representation of each classification in each batch
+        DataSetIterator dataIter = new MnistDataSetIterator(batchSize, numTrainSamples);
+        return dataIter;
+    }
+
+    static MultiLayerNetwork buildModel(final int featureMapSize){
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .nIn(numRows * numColumns).nOut(10).batchSize(batchSize)
-                .iterations(100).weightInit(WeightInit.ZERO)
-                .activationFunction("sigmoid").filterSize(30, 1, numRows, numColumns)
-                .lossFunction(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD).learningRate(0.13)
-                .optimizationAlgo(OptimizationAlgorithm.GRADIENT_DESCENT).constrainGradientToUnitNorm(true)
-                .list(3).hiddenLayerSizes(72)
-                .inputPreProcessor(0, new ConvolutionInputPreProcessor(numRows, numColumns)).preProcessor(1, new ConvolutionPostProcessor())
+                .nIn(numRows * numColumns)
+                .nOut(10)
+                .batchSize(batchSize)
+                .iterations(100)
+                .weightInit(WeightInit.ZERO)
+                .activationFunction(activationFunc)
+                .filterSize(batchSize, 1, numRows, numColumns)
+                .lossFunction(lossFunc).learningRate(learningRate)
+                .optimizationAlgo(OptimizationAlgorithm.GRADIENT_DESCENT)
+                .constrainGradientToUnitNorm(true)
+                .list(3)
+                .hiddenLayerSizes(hLayerSize)
+                .inputPreProcessor(0, new ConvolutionInputPreProcessor(numRows, numColumns))
+                .preProcessor(1, new ConvolutionPostProcessor())
                 .override(0, new ConfOverride() {
                     public void overrideLayer(int i, NeuralNetConfiguration.Builder builder) {
                         builder.layer(new ConvolutionLayer());
                         builder.convolutionType(ConvolutionLayer.ConvolutionType.MAX);
-                        builder.featureMapSize(11, 11);
-                    }
-                }).override(1, new ConfOverride() {
+                        builder.featureMapSize(featureMapSize,featureMapSize);}
+                })
+                .override(1, new ConfOverride() {
                     public void overrideLayer(int i, NeuralNetConfiguration.Builder builder) {
                         builder.layer(new SubsamplingLayer());
                     }
-                }).override(2, new ClassifierOverride(2))
+                })
+                .override(2, new ClassifierOverride(2))
                 .build();
         MultiLayerNetwork network = new MultiLayerNetwork(conf);
         network.init();
-
-        log.info("Train model....");
         network.setListeners(Arrays.<IterationListener>asList(new ScoreIterationListener(1)));
+        return network;
+    }
 
-        while(trainDataSetIterator.hasNext()) {
-            DataSet trainBatchData = trainDataSetIterator.next();
-            network.fit(trainBatchData);
+    static MultiLayerNetwork trainModel(DataSetIterator data, MultiLayerNetwork network){
+        while (data.hasNext()){
+            DataSet allData = data.next();
+            allData.normalizeZeroMeanZeroUnitVariance();
+            network.fit(allData);
         }
+        return network;
 
-        log.info("Evaluate model....");
+    }
+
+    static void evaluateModel(MultiLayerNetwork network, DataSetIterator testData){
         Evaluation eval = new Evaluation();
+        DataSet allTest = testData.next();
+
+        INDArray testInput = allTest.getFeatureMatrix();
+        INDArray testLabels = allTest.getLabels();
         INDArray output = network.output(testInput);
         eval.eval(testLabels, output);
         log.info(eval.stats());
-        log.info("****************Example finished********************");
+    }
 
+    public void exec(String[] args) throws Exception {
+        CmdLineParser parser = new CmdLineParser(this);
+        try {
+            parser.parseArgument(args);
+
+        } catch (CmdLineException e) {
+            // handling of wrong arguments
+            System.err.println(e.getMessage());
+            parser.printUsage(System.err);
+        }
+
+        log.info("Load data....");
+        DataSetIterator dataIter = loadData((int) numTrainSamples);
+
+        log.info("Build model....");
+        MultiLayerNetwork network = buildModel(featureMapSize);
+
+        log.info("Train model....");
+        trainModel(dataIter, network);
+
+        log.info("Evaluate model....");
+        DataSetIterator testData = loadData((int) numTestSamples);
+        evaluateModel(network, testData);
+
+        log.info("****************Example finished********************");
+    }
+
+    public static void main( String[] args ) throws Exception
+    {
+        new CNNMnistExample().exec(args);
 
     }
 }
