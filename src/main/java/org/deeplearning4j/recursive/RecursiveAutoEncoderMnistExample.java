@@ -38,7 +38,7 @@ public class RecursiveAutoEncoderMnistExample {
                 .optimizationAlgo(OptimizationAlgorithm.ITERATION_GRADIENT_DESCENT)
                 .corruptionLevel(0.3).weightInit(WeightInit.VI)
                 .iterations(10)
-                .lossFunction(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
+                .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
                 .learningRate(1e-1f).nIn(784).nOut(600)
                 .layer(new RecursiveAutoEncoder())
                 .build();
