@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Created by willow on 5/11/15.
@@ -43,7 +44,7 @@ public class RecursiveAutoEncoderMnistExample {
                 .learningRate(1e-1f)
                 .build();
         Layer model = LayerFactories.getFactory(conf).create(conf);
-        model.setIterationListeners(Arrays.<IterationListener>asList(new ScoreIterationListener(1)));
+        Collections.singletonList((IterationListener) new ScoreIterationListener(1));
         model.setParams(model.params());
 
         log.info("Training model...");

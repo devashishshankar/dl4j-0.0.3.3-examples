@@ -57,7 +57,7 @@ public class DBNFullMnistExample {
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
-        model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
+        Collections.singletonList((IterationListener) new ScoreIterationListener(1));
 
         log.info("Train model....");
         model.fit(iter); // achieves end to end pre-training
@@ -70,7 +70,7 @@ public class DBNFullMnistExample {
         DataSetIterator testIter = new MnistDataSetIterator(100,10000);
         while(testIter.hasNext()) {
             DataSet testMnist = testIter.next();
-            testMnist.scale();
+            testMnist.normalizeZeroMeanZeroUnitVariance();
             INDArray predict2 = model.output(testMnist.getFeatureMatrix());
             eval.eval(testMnist.getLabels(), predict2);
         }

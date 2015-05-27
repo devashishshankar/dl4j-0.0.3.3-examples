@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Created by willow on 5/11/15.
@@ -42,7 +43,7 @@ public class RecurrentLSTMMnistExample {
                 .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
                 .nIn(784).nOut(784).build();
         Layer layer = LayerFactories.getFactory(conf.getLayer()).create(conf);
-        layer.setIterationListeners(Arrays.<IterationListener>asList(new ScoreIterationListener(1)));
+        Collections.singletonList((IterationListener) new ScoreIterationListener(1));
 
         log.info("Training model...");
         layer.fit(input);

@@ -33,7 +33,7 @@ public class DBNSmallMnistExample {
     public static void main(String[] args) throws Exception {
 
         log.info("Load data....");
-        DataSetIterator iter = new MultipleEpochsIterator(10, new MnistDataSetIterator(1000,1000));
+        DataSetIterator iter = new MultipleEpochsIterator(10, new MnistDataSetIterator(100,100));
 
         log.info("Build model....");
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
@@ -60,6 +60,7 @@ public class DBNSmallMnistExample {
         Evaluation eval = new Evaluation();
         while(iter.hasNext()) {
             DataSet test_data = iter.next();
+            test_data.normalizeZeroMeanZeroUnitVariance();
             INDArray predict2 = model.output(test_data.getFeatureMatrix());
             eval.eval(test_data.getLabels(), predict2);
         }

@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * @author sonali
@@ -46,8 +47,7 @@ public class CNNIrisExample {
         log.info("Load data....");
         DataSetIterator irisIter = new IrisDataSetIterator(150, 150);
         DataSet iris = irisIter.next();
-//        next.normalizeZeroMeanZeroUnitVariance();
-        iris.scale();
+        iris.normalizeZeroMeanZeroUnitVariance();
 
         SplitTestAndTrain trainTest = iris.splitTestAndTrain(batchSize);
 
@@ -79,7 +79,7 @@ public class CNNIrisExample {
         log.info("Build model....");
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
-        model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
+        Collections.singletonList((IterationListener) new ScoreIterationListener(1));
 
         log.info("Train model....");
         model.fit(trainTest.getTrain());

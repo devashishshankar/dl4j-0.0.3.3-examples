@@ -21,9 +21,16 @@ public class TSNEReadTextExample {
        WeightLookupTable pair = SerializationUtils.readObject(new File(args[0]));
 
         log.info("Build model....");
-        BarnesHutTsne tsne = new BarnesHutTsne.Builder().setMaxIter(1000).stopLyingIteration(250)
-                .learningRate(500).useAdaGrad(false).theta(0.5).setMomentum(0.5)
-                .normalize(true).usePca(false).build();
+        BarnesHutTsne tsne = new BarnesHutTsne.Builder()
+                .setMaxIter(1000)
+                .normalize(true)
+                .stopLyingIteration(250)
+                .learningRate(500)
+                .theta(0.5)
+                .setMomentum(0.5)
+                .useAdaGrad(false)
+                .usePca(false)
+                .build();
 
         log.info("Plot TSNE....");
         pair.plotVocab(tsne);

@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 
 
 /**
@@ -44,8 +45,6 @@ public class DBNIrisExample {
         log.info("Load data....");
         DataSetIterator iter = new IrisDataSetIterator(150, 150);
         DataSet next = iter.next();
-
-        Nd4j.writeTxt(next.getFeatureMatrix(), "iris.txt", "\t");
         next.normalizeZeroMeanZeroUnitVariance();
 
         log.info("Split data....");
@@ -78,7 +77,7 @@ public class DBNIrisExample {
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
-        model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
+        Collections.singletonList((IterationListener) new ScoreIterationListener(1));
 
         log.info("Train model....");
         model.fit(train);

@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public class RBMCreateDataExample {
 
@@ -59,7 +60,7 @@ public class RBMCreateDataExample {
                 .optimizationAlgo(OptimizationAlgorithm.ITERATION_GRADIENT_DESCENT)
                 .build();
         Layer model = LayerFactories.getFactory(conf).create(conf);
-        model.setIterationListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
+        Collections.singletonList((IterationListener) new ScoreIterationListener(1));
 
         log.info("Train model....");
         model.fit(trainingSet.getFeatureMatrix());

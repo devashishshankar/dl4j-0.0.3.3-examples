@@ -33,7 +33,6 @@ public class GloveRawSentenceExample {
         // Customizing params
         Nd4j.ENFORCE_NUMERICAL_STABILITY = true;
         int layerSize = 300;
-        final EndingPreProcessor preProcessor = new EndingPreProcessor();
 
         log.info("Load data....");
         ClassPathResource resource = new ClassPathResource("raw_sentences.txt");
@@ -46,26 +45,46 @@ public class GloveRawSentenceExample {
         });
 
         log.info("Tokenize data....");
+        final EndingPreProcessor preProcessor = new EndingPreProcessor();
         InMemoryLookupCache cache = new InMemoryLookupCache();
         TokenizerFactory tokenizer = new DefaultTokenizerFactory();
-        TextVectorizer  tfidf = new TfidfVectorizer.Builder()
-                .cache(cache).iterate(iter).minWords(1).tokenize(tokenizer).build();
-        tfidf.fit();
         tokenizer.setTokenPreProcessor(preProcessor);
+        TextVectorizer  tfidf = new TfidfVectorizer.Builder()
+                .cache(cache)
+                .iterate(iter)
+                .minWords(1)
+                .tokenize(tokenizer)
+                .build();
+        tfidf.fit();
 
         log.info("Build model....");
         CoOccurrences coOccur = new CoOccurrences.Builder()
-                .cache(cache).iterate(iter).tokenizer(tokenizer).build();
+                .cache(cache)
+                .iterate(iter)
+                .tokenizer(tokenizer)
+                .build();
         coOccur.fit();
 
         GloveWeightLookupTable table = new GloveWeightLookupTable.Builder()
-                .cache(cache).lr(0.005).build();
+                .cache(cache)
+                .lr(0.005)
+                .build();
 
-        Glove vec = new Glove.Builder().learningRate(0.005).batchSize(1000)
-                .cache(cache).coOccurrences(coOccur).cache(cache)
-                .iterations(30).vectorizer(tfidf).weights(table)
-                .layerSize(layerSize).iterate(iter).tokenizer(tokenizer).minWordFrequency(1).symmetric(true)
-                .windowSize(15).build();
+        Glove vec = new Glove.Builder()
+                .learningRate(0.005)
+                .batchSize(1000)
+                .cache(cache)
+                .coOccurrences(coOccur)
+                .iterations(30)
+                .vectorizer(tfidf)
+                .weights(table)
+                .layerSize(layerSize)
+                .iterate(iter)
+                .tokenizer(tokenizer)
+                .minWordFrequency(1)
+                .symmetric(true)
+                .windowSize(15)
+                .build();
 
         log.info("Train model....");
         vec.fit();

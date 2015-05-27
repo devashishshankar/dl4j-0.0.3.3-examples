@@ -21,12 +21,17 @@ public class TSNECreateDataExample {
     private static Logger log = LoggerFactory.getLogger(TSNECreateDataExample.class);
 
     public static void main(String[] args) throws Exception  {
+
         List<String> cacheList = new ArrayList<>();
 
         log.info("Build model....");
-        Tsne tsne = new Tsne.Builder().setMaxIter(10000)
-                .learningRate(500).useAdaGrad(false)
-                .normalize(false).usePca(false).build();
+        Tsne tsne = new Tsne.Builder()
+                .setMaxIter(10000)
+                .normalize(false)
+                .learningRate(500)
+                .useAdaGrad(false)
+                .usePca(false)
+                .build();
 
         log.info("Vectorize data....");
         Pair<InMemoryLookupTable,VocabCache> vectors = WordVectorSerializer.loadTxt(new File(args[0]));

@@ -75,7 +75,7 @@ public class MLPBackpropIrisExample {
         log.info("Train model....");
         while(iter.hasNext()) {
             DataSet iris = iter.next();
-            iris.scale();
+            iris.normalizeZeroMeanZeroUnitVariance();
             model.fit(iris);
         }
         iter.reset();
@@ -84,7 +84,7 @@ public class MLPBackpropIrisExample {
         Evaluation eval = new Evaluation();
         while(iter.hasNext()) {
             DataSet test = iter.next();
-            test.scale();
+            test.normalizeZeroMeanZeroUnitVariance();
             INDArray output = model.output(test.getFeatureMatrix());
             eval.eval(test.getLabels(), output);
             log.info(eval.stats());
