@@ -45,29 +45,35 @@ public class RBMIrisExample {
 
         log.info("Load data....");
         DataSetIterator iter = new IrisDataSetIterator(150, 150);
-        DataSet next = iter.next();
-        Nd4j.writeTxt(next.getFeatureMatrix(), "iris.txt", "\t");
-        next.normalizeZeroMeanZeroUnitVariance();
-
-        log.info("Split data....");
-        SplitTestAndTrain testAndTrain = next.splitTestAndTrain(110);
-        DataSet train = testAndTrain.getTrain();
-        DataSet test = testAndTrain.getTest();
+        DataSet iris = iter.next();
+        iris.scale();
 
         log.info("Build model....");
         NeuralNetConfiguration conf = new NeuralNetConfiguration.Builder()
-                .layer(new RBM()).nIn(4).nOut(3)
-                .visibleUnit(RBM.VisibleUnit.GAUSSIAN).hiddenUnit(RBM.HiddenUnit.RECTIFIED)
-                .iterations(100).weightInit(WeightInit.DISTRIBUTION).dist(new UniformDistribution(0, 1))
-                .activationFunction("tanh").k(1)
+                .layer(new RBM())
+                .nIn(4)
+                .nOut(3)
+                .visibleUnit(RBM.VisibleUnit.GAUSSIAN)
+                .hiddenUnit(RBM.HiddenUnit.RECTIFIED)
+                .iterations(100)
+                .weightInit(WeightInit.DISTRIBUTION)
+                .dist(new UniformDistribution(0, 1))
+                .activationFunction("tanh")
+                .k(1)
                 .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
-                .learningRate(1e-1f).momentum(0.9).regularization(true).l2(2e-4)
-                .optimizationAlgo(OptimizationAlgorithm.LBFGS).constrainGradientToUnitNorm(true)
+                .learningRate(1e-1f)
+                .momentum(0.9)
+                .regularization(true)
+                .l2(2e-4)
+                .optimizationAlgo(OptimizationAlgorithm.LBFGS)
+                .constrainGradientToUnitNorm(true)
                 .build();
         Layer model = LayerFactories.getFactory(conf.getLayer()).create(conf);
         model.setIterationListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
 
         log.info("Train model....");
-        model.fit(train.getFeatureMatrix());
+        model.fit((INDArray) iris);
+
+        // Single layer just learns features and can't be supervised. Thus cannot be evaluated.
     }
 }

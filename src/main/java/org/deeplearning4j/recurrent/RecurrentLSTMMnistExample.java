@@ -35,8 +35,10 @@ public class RecurrentLSTMMnistExample {
         INDArray input = d2.getFeatureMatrix();
 
         log.info("Building model...");
-        NeuralNetConfiguration conf = new NeuralNetConfiguration.Builder().activationFunction("sigmoid")
-                .layer(new LSTM()).optimizationAlgo(OptimizationAlgorithm.LBFGS)
+        NeuralNetConfiguration conf = new NeuralNetConfiguration.Builder()
+                .activationFunction("sigmoid")
+                .layer(new LSTM())
+                .optimizationAlgo(OptimizationAlgorithm.LBFGS)
                 .lossFunction(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
                 .nIn(784).nOut(784).build();
         Layer layer = LayerFactories.getFactory(conf.getLayer()).create(conf);

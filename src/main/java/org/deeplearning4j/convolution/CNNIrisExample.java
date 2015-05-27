@@ -17,12 +17,16 @@ import org.deeplearning4j.nn.layers.convolution.preprocessor.ConvolutionPostProc
 import org.deeplearning4j.nn.layers.factory.LayerFactories;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
+import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.SplitTestAndTrain;
 import org.nd4j.linalg.factory.Nd4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 /**
  * @author sonali
@@ -39,44 +43,53 @@ public class CNNIrisExample {
         /**
          *Set a neural network configuration with multiple layers
          */
+        log.info("Load data....");
+        DataSetIterator irisIter = new IrisDataSetIterator(150, 150);
+        DataSet iris = irisIter.next();
+//        next.normalizeZeroMeanZeroUnitVariance();
+        iris.scale();
+
+        SplitTestAndTrain trainTest = iris.splitTestAndTrain(batchSize);
+
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
+                .nIn(numRows * numColumns)
+                .nOut(3)
+                .iterations(10)
+                .weightInit(WeightInit.VI)
+                .activationFunction("tanh")
+                .filterSize(5, 1, numRows, numColumns)
+                .batchSize(batchSize)
                 .optimizationAlgo(OptimizationAlgorithm.LBFGS)
-                .iterations(10).weightInit(WeightInit.VI)
-                .activationFunction("tanh").filterSize(5, 1, numRows, numColumns).constrainGradientToUnitNorm(true)
-                .nIn(numRows * numColumns).nOut(3).batchSize(batchSize)
+                .constrainGradientToUnitNorm(true)
                 .dropOut(0.5)
                 .list(2)
-                .preProcessor(1, new ConvolutionPostProcessor()).inputPreProcessor(0, new ConvolutionInputPreProcessor(numRows, numColumns))
                 .hiddenLayerSizes(9)
+                .inputPreProcessor(0, new ConvolutionInputPreProcessor(numRows, numColumns))
+                .preProcessor(1, new ConvolutionPostProcessor())
                 .override(0, new ConfOverride() {
                     public void overrideLayer(int i, NeuralNetConfiguration.Builder builder) {
                         builder.layer(new ConvolutionLayer());
                         builder.convolutionType(ConvolutionLayer.ConvolutionType.MAX);
                         builder.featureMapSize(2, 2);
                     }
-                }).override(1, new ClassifierOverride())
+                })
+                .override(1, new ClassifierOverride(1))
                 .build();
 
-        //Create a neural net from the configuration
-        MultiLayerNetwork network = new MultiLayerNetwork(conf);
+        log.info("Build model....");
+        MultiLayerNetwork model = new MultiLayerNetwork(conf);
+        model.init();
+        model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
 
-        //Iterator for iris dataset
-        DataSetIterator iter = new IrisDataSetIterator(150, 150);
+        log.info("Train model....");
+        model.fit(trainTest.getTrain());
 
-        //Normalize data
-        org.nd4j.linalg.dataset.DataSet next = iter.next();
-        next.normalizeZeroMeanZeroUnitVariance();
-
-        //Split data into testing and training
-        SplitTestAndTrain trainTest = next.splitTestAndTrain(110);
-
-        //Train model
-        network.fit(trainTest.getTrain());
-
-        //Evaluate results of model
+        log.info("Evaluate model....");
         Evaluation eval = new Evaluation();
-        INDArray output = network.output(trainTest.getTest().getFeatureMatrix());
-        eval.eval(trainTest.getTest().getLabels(),output);
-        log.info("Score " +eval.stats());
+        INDArray output = model.output(trainTest.getTest().getFeatureMatrix());
+        eval.eval(trainTest.getTest().getLabels(), output);
+        log.info(eval.stats());
+
+        log.info("****************Example finished********************");
     }
 }
