@@ -44,6 +44,7 @@ public class DBNIrisExample {
         log.info("Load data....");
         DataSetIterator iter = new IrisDataSetIterator(150, 150);
         DataSet next = iter.next();
+
         Nd4j.writeTxt(next.getFeatureMatrix(), "iris.txt", "\t");
         next.normalizeZeroMeanZeroUnitVariance();
 
@@ -54,15 +55,26 @@ public class DBNIrisExample {
 
         log.info("Build model....");
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .layer(new RBM()).nIn(4).nOut(3)
-                .visibleUnit(RBM.VisibleUnit.GAUSSIAN).hiddenUnit(RBM.HiddenUnit.RECTIFIED)
-                .iterations(100).weightInit(WeightInit.DISTRIBUTION).dist(new UniformDistribution(0, 1))
-                .activationFunction("tanh").k(1)
+                .layer(new RBM())
+                .nIn(4)
+                .nOut(3)
+                .visibleUnit(RBM.VisibleUnit.GAUSSIAN)
+                .hiddenUnit(RBM.HiddenUnit.RECTIFIED)
+                .iterations(100)
+                .weightInit(WeightInit.DISTRIBUTION)
+                .dist(new UniformDistribution(0, 1))
+                .activationFunction("tanh")
+                .k(1)
                 .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
-                .learningRate(1e-1f).momentum(0.9).regularization(true).l2(2e-4)
-                .optimizationAlgo(OptimizationAlgorithm.LBFGS).constrainGradientToUnitNorm(true)
-                .list(2).hiddenLayerSizes(3)
-                .override(1,new ClassifierOverride(1))
+                .learningRate(1e-1f)
+                .momentum(0.9)
+                .regularization(true)
+                .l2(2e-4)
+                .optimizationAlgo(OptimizationAlgorithm.LBFGS)
+                .constrainGradientToUnitNorm(true)
+                .list(2)
+                .hiddenLayerSizes(3)
+                .override(1, new ClassifierOverride(1))
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
@@ -74,7 +86,9 @@ public class DBNIrisExample {
         log.info("Evaluate model....");
         Evaluation eval = new Evaluation();
         INDArray output = model.output(test.getFeatureMatrix());
-        eval.eval(test.getLabels(),output);
+        eval.eval(test.getLabels(), output);
         log.info(eval.stats());
+        log.info("****************Example finished********************");
+
     }
 }

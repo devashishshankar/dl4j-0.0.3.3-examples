@@ -32,15 +32,20 @@ public class DBNLWFExample {
     public static void main(String[] args) throws Exception {
 
         log.info("Load data....");
-        DataSetIterator fetcher = new LFWDataSetIterator(1000,10000);
+        DataSetIterator dataIter = new LFWDataSetIterator(1000,10000);
 
         log.info("Build model....");
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .layer(new RBM()).nIn(fetcher.inputColumns()).nOut(fetcher.totalOutcomes())
-                .weightInit(WeightInit.DISTRIBUTION).dist(new NormalDistribution(1e-3, 1e-1))
-                .lossFunction(LossFunctions.LossFunction.RMSE_XENT).constrainGradientToUnitNorm(true)
+                .layer(new RBM())
+                .nIn(dataIter.inputColumns())
+                .nOut(dataIter.totalOutcomes())
+                .weightInit(WeightInit.DISTRIBUTION)
+                .dist(new NormalDistribution(1e-3, 1e-1))
+                .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
+                .constrainGradientToUnitNorm(true)
                 .learningRate(1e-3f)
-                .list(4).hiddenLayerSizes(600, 250, 200)
+                .list(4)
+                .hiddenLayerSizes(600, 250, 200)
                 .override(3,new ClassifierOverride())
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
@@ -48,8 +53,8 @@ public class DBNLWFExample {
         model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
 
         log.info("Train model....");
-        while(fetcher.hasNext()) {
-            DataSet next = fetcher.next();
+        while(dataIter.hasNext()) {
+            DataSet next = dataIter.next();
             next.scale();
             model.fit(next);
 
