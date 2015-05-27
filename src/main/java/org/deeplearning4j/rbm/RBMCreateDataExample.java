@@ -7,12 +7,16 @@ import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.layers.factory.LayerFactories;
 import org.deeplearning4j.nn.weights.WeightInit;
+import org.deeplearning4j.optimize.api.IterationListener;
+import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 public class RBMCreateDataExample {
 
@@ -42,16 +46,20 @@ public class RBMCreateDataExample {
 
         log.info("Build model....");
         NeuralNetConfiguration conf = new NeuralNetConfiguration.Builder()
-                .layer(new RBM()).nIn(trainingSet.numInputs()).nOut(trainingSet.numOutcomes())
-                .weightInit(WeightInit.SIZE).iterations(3)
+                .layer(new RBM())
+                .nIn(trainingSet.numInputs())
+                .nOut(trainingSet.numOutcomes())
+                .weightInit(WeightInit.SIZE)
+                .iterations(3)
                 .activationFunction("tanh")
-                .visibleUnit(org.deeplearning4j.nn.conf.layers.RBM.VisibleUnit.GAUSSIAN)
-                .hiddenUnit(org.deeplearning4j.nn.conf.layers.RBM.HiddenUnit.RECTIFIED)
+                .visibleUnit(RBM.VisibleUnit.GAUSSIAN)
+                .hiddenUnit(RBM.HiddenUnit.RECTIFIED)
                 .lossFunction(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
                 .learningRate(1e-1f)
                 .optimizationAlgo(OptimizationAlgorithm.ITERATION_GRADIENT_DESCENT)
                 .build();
         Layer model = LayerFactories.getFactory(conf).create(conf);
+        model.setIterationListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
 
         log.info("Train model....");
         model.fit(trainingSet.getFeatureMatrix());

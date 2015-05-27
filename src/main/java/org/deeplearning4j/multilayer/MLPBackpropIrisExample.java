@@ -42,26 +42,29 @@ public class MLPBackpropIrisExample {
         Nd4j.MAX_ELEMENTS_PER_SLICE = -1;
 
         log.info("Load data....");
-        DataSetIterator iter = new IrisDataSetIterator(150, 150);
-        DataSet next = iter.next();
-        Nd4j.writeTxt(next.getFeatureMatrix(), "iris.txt", "\t");
-        next.normalizeZeroMeanZeroUnitVariance();
-
-        log.info("Split data....");
-        SplitTestAndTrain testAndTrain = next.splitTestAndTrain(110);
-        DataSet train = testAndTrain.getTrain();
-        DataSet test = testAndTrain.getTest();
+        DataSetIterator iter = new IrisDataSetIterator(10, 150);
 
         log.info("Build model....");
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .layer(new RBM()).nIn(4).nOut(3)
-                .visibleUnit(RBM.VisibleUnit.GAUSSIAN).hiddenUnit(RBM.HiddenUnit.RECTIFIED)
-                .iterations(100).weightInit(WeightInit.DISTRIBUTION).dist(new UniformDistribution(0, 1))
-                .activationFunction("tanh").k(1)
+                .layer(new RBM())
+                .nIn(4)
+                .nOut(3)
+                .visibleUnit(RBM.VisibleUnit.GAUSSIAN)
+                .hiddenUnit(RBM.HiddenUnit.RECTIFIED)
+                .iterations(100)
+                .weightInit(WeightInit.DISTRIBUTION)
+                .dist(new UniformDistribution(0, 1))
+                .activationFunction("tanh")
+                .k(1)
                 .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
-                .learningRate(1e-1f).momentum(0.9).regularization(true).l2(2e-4)
-                .optimizationAlgo(OptimizationAlgorithm.LBFGS).constrainGradientToUnitNorm(true)
-                .list(2).hiddenLayerSizes(new int[]{3})
+                .learningRate(1e-1f)
+                .momentum(0.9)
+                .regularization(true)
+                .l2(2e-4)
+                .optimizationAlgo(OptimizationAlgorithm.LBFGS)
+                .constrainGradientToUnitNorm(true)
+                .list(2)
+                .hiddenLayerSizes(new int[]{3})
                 .backward(true)
                 .override(1,new ClassifierOverride(1))
                 .build();
@@ -70,12 +73,23 @@ public class MLPBackpropIrisExample {
         model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
 
         log.info("Train model....");
-        model.fit(train);
+        while(iter.hasNext()) {
+            DataSet iris = iter.next();
+            iris.scale();
+            model.fit(iris);
+        }
+        iter.reset();
 
         log.info("Evaluate model....");
         Evaluation eval = new Evaluation();
-        INDArray output = model.output(test.getFeatureMatrix());
-        eval.eval(test.getLabels(),output);
-        log.info(eval.stats());
+        while(iter.hasNext()) {
+            DataSet test = iter.next();
+            test.scale();
+            INDArray output = model.output(test.getFeatureMatrix());
+            eval.eval(test.getLabels(), output);
+            log.info(eval.stats());
+        }
+        log.info("****************Example finished********************");
+
     }
 }

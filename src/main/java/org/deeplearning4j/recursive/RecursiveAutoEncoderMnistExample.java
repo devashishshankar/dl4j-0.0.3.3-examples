@@ -28,26 +28,32 @@ public class RecursiveAutoEncoderMnistExample {
 
         log.info("Loading data...");
         MnistDataFetcher fetcher = new MnistDataFetcher(true);
-        fetcher.fetch(10);
-        DataSet d2 = fetcher.next();
-        INDArray input = d2.getFeatureMatrix();
 
         log.info("Building model...");
         NeuralNetConfiguration conf = new NeuralNetConfiguration.Builder()
+                .layer(new RecursiveAutoEncoder())
+                .nIn(784)
+                .nOut(600)
                 .momentum(0.9f)
-                .optimizationAlgo(OptimizationAlgorithm.ITERATION_GRADIENT_DESCENT)
-                .corruptionLevel(0.3).weightInit(WeightInit.VI)
+                .corruptionLevel(0.3)
+                .weightInit(WeightInit.VI)
                 .iterations(10)
                 .lossFunction(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
-                .learningRate(1e-1f).nIn(784).nOut(600)
-                .layer(new RecursiveAutoEncoder())
+                .optimizationAlgo(OptimizationAlgorithm.ITERATION_GRADIENT_DESCENT)
+                .learningRate(1e-1f)
                 .build();
-
-        log.info("Training model...");
         Layer model = LayerFactories.getFactory(conf).create(conf);
         model.setIterationListeners(Arrays.<IterationListener>asList(new ScoreIterationListener(1)));
         model.setParams(model.params());
-        model.fit(input);
+
+        log.info("Training model...");
+
+        for(int i=0 ; i < 100; i++) {
+            fetcher.fetch(10);
+            DataSet data = fetcher.next();
+            INDArray input = data.getFeatureMatrix();
+            model.fit(input);
+        }
 
         // Generative Model - unsupervised and requires different evaluation technique
 

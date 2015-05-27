@@ -11,17 +11,21 @@ import org.deeplearning4j.nn.conf.layers.RBM;
 import org.deeplearning4j.nn.conf.override.ClassifierOverride;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
+import org.deeplearning4j.optimize.api.IterationListener;
+import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+
 
 /**
  * Created by agibsonccc on 9/11/14.
  *
- * Diff from small adds Multiple Epochs Iterator and ClassifierOverride
+ * Diff from small conducts pretraining+fine-tuning on every single batch
  */
 public class DBNMnistReconstructExample {
 
@@ -30,19 +34,31 @@ public class DBNMnistReconstructExample {
     public static void main(String[] args) throws Exception {
 
         log.info("Load data....");
-        DataSetIterator iter = new MultipleEpochsIterator(10, new MnistDataSetIterator(1000,1000));
+        DataSetIterator iter = new MnistDataSetIterator(100,1000);
 
         log.info("Build model....");
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .layer(new RBM()).nIn(784).nOut(10).weightInit(WeightInit.VI).iterations(5)
-                .lossFunction(LossFunctions.LossFunction.RMSE_XENT).learningRate(1e-1f)
-                .list(4).hiddenLayerSizes(new int[]{600, 500, 400})
-                .override(3,new ClassifierOverride())
+                .layer(new RBM())
+                .nIn(784)
+                .nOut(10)
+                .weightInit(WeightInit.VI)
+                .iterations(5)
+                .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
+                .learningRate(1e-1f)
+                .list(4)
+                .hiddenLayerSizes(new int[]{600, 500, 400})
+                .override(3,new ClassifierOverride(3))
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
+        model.init();
+        model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
 
         log.info("Train model....");
-        model.fit(iter);
+
+        while(iter.hasNext()) {
+            DataSet mnist = iter.next();
+            model.fit(mnist);
+        }
         iter.reset();
 
         log.info("Evaluate model....");
