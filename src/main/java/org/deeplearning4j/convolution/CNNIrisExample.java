@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * @author sonali
@@ -46,8 +47,7 @@ public class CNNIrisExample {
         log.info("Load data....");
         DataSetIterator irisIter = new IrisDataSetIterator(150, 150);
         DataSet iris = irisIter.next();
-//        next.normalizeZeroMeanZeroUnitVariance();
-        iris.scale();
+        iris.normalizeZeroMeanZeroUnitVariance();
 
         SplitTestAndTrain trainTest = iris.splitTestAndTrain(batchSize);
 
@@ -63,9 +63,9 @@ public class CNNIrisExample {
                 .constrainGradientToUnitNorm(true)
                 .dropOut(0.5)
                 .list(2)
-                .hiddenLayerSizes(9)
+                .hiddenLayerSizes(4)
                 .inputPreProcessor(0, new ConvolutionInputPreProcessor(numRows, numColumns))
-                .preProcessor(1, new ConvolutionPostProcessor())
+                .preProcessor(0, new ConvolutionPostProcessor())
                 .override(0, new ConfOverride() {
                     public void overrideLayer(int i, NeuralNetConfiguration.Builder builder) {
                         builder.layer(new ConvolutionLayer());
@@ -79,7 +79,7 @@ public class CNNIrisExample {
         log.info("Build model....");
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
-        model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
+        Collections.singletonList((IterationListener) new ScoreIterationListener(1));
 
         log.info("Train model....");
         model.fit(trainTest.getTrain());

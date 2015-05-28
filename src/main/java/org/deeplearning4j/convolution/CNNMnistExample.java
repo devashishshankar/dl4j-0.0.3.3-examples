@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Created by willow on 5/11/15.
@@ -35,29 +36,28 @@ public class CNNMnistExample {
 
         final int numRows = 28;
         final int numColumns = 28;
-        int batchSize = 10; // TODO return to 1802
+        int batchSize = 10;
 
         log.info("Load data....");
-        DataSetIterator mnist = new MnistDataSetIterator(100,100); // TODO change back to 100,1000 (batch, numExamples) - there are 60k avail
+        DataSetIterator mnist = new MnistDataSetIterator(100,100);
         DataSet all = mnist.next();
         all.normalizeZeroMeanZeroUnitVariance();
 
         log.info("Split data....");
-        SplitTestAndTrain trainTest = all.splitTestAndTrain(90); // train set that is the result - should flip // TODO put back to 80% of data
+        SplitTestAndTrain trainTest = all.splitTestAndTrain(90); // train set that is the result
         DataSet trainInput = trainTest.getTrain(); // get feature matrix and labels for training
         INDArray testInput = trainTest.getTest().getFeatureMatrix();
         INDArray testLabels = trainTest.getTest().getLabels();
 
         log.info("Build model....");
-        // TODO iterations back to 10
-        // TODO try the if then without the input and preprocess for all layers
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .nIn(numRows * numColumns).nOut(10).batchSize(batchSize)
-                .iterations(4).weightInit(WeightInit.VI)
+                .iterations(4).weightInit(WeightInit.UNIFORM)
                 .activationFunction("sigmoid").filterSize(7, 1, numRows, numColumns)
                 .optimizationAlgo(OptimizationAlgorithm.LBFGS).constrainGradientToUnitNorm(true)
                 .list(3).hiddenLayerSizes(new int[]{50})
-                .inputPreProcessor(0, new ConvolutionInputPreProcessor(numRows, numColumns)).preProcessor(1, new ConvolutionPostProcessor())
+                .inputPreProcessor(0, new ConvolutionInputPreProcessor(numRows, numColumns))
+                .preProcessor(1, new ConvolutionPostProcessor())
                 .override(0, new ConfOverride() {
                     public void overrideLayer(int i, NeuralNetConfiguration.Builder builder) {
                         builder.layer(new ConvolutionLayer());
@@ -70,17 +70,17 @@ public class CNNMnistExample {
                     }
                 }).override(2, new ClassifierOverride())
                 .build();
-        MultiLayerNetwork network = new MultiLayerNetwork(conf);
-        network.init();
+        MultiLayerNetwork model = new MultiLayerNetwork(conf);
+        model.init();
 
         log.info("Train model....");
-        network.setListeners(Arrays.<IterationListener>asList(new ScoreIterationListener(1)));
-        network.fit(trainInput);
+        model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
+        model.fit(trainInput);
 
         log.info("Evaluate model....");
         Evaluation eval = new Evaluation();
-        INDArray output = network.output(testInput);
-        eval.eval(testLabels,output);
+        INDArray output = model.output(testInput);
+        eval.eval(testLabels, output);
         log.info(eval.stats());
         log.info("****************Example finished********************");
 

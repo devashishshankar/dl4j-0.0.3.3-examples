@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 
 
 /**
@@ -51,7 +52,7 @@ public class MLPBackpropIrisExample {
                 .nOut(3)
                 .visibleUnit(RBM.VisibleUnit.GAUSSIAN)
                 .hiddenUnit(RBM.HiddenUnit.RECTIFIED)
-                .iterations(100)
+                .iterations(1000)
                 .weightInit(WeightInit.DISTRIBUTION)
                 .dist(new UniformDistribution(0, 1))
                 .activationFunction("tanh")
@@ -70,25 +71,23 @@ public class MLPBackpropIrisExample {
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
-        model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
-
+        Collections.singletonList((IterationListener) new ScoreIterationListener(1));
         log.info("Train model....");
         while(iter.hasNext()) {
             DataSet iris = iter.next();
-            iris.scale();
+            iris.normalizeZeroMeanZeroUnitVariance();
             model.fit(iris);
         }
         iter.reset();
 
         log.info("Evaluate model....");
         Evaluation eval = new Evaluation();
-        while(iter.hasNext()) {
-            DataSet test = iter.next();
-            test.scale();
-            INDArray output = model.output(test.getFeatureMatrix());
-            eval.eval(test.getLabels(), output);
-            log.info(eval.stats());
-        }
+        DataSetIterator iterTest = new IrisDataSetIterator(150, 150);
+        DataSet test = iterTest.next();
+        test.normalizeZeroMeanZeroUnitVariance();
+        INDArray output = model.output(test.getFeatureMatrix());
+        eval.eval(test.getLabels(), output);
+        log.info(eval.stats());
         log.info("****************Example finished********************");
 
     }

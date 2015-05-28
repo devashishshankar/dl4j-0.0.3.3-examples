@@ -30,7 +30,6 @@ public class Word2VecRawTextExample {
         // Customizing params
         Nd4j.ENFORCE_NUMERICAL_STABILITY = true;
         int layerSize = 300;
-        final EndingPreProcessor preProcessor = new EndingPreProcessor();
 
         log.info("Load data....");
         ClassPathResource resource = new ClassPathResource("raw_sentences.txt");
@@ -43,8 +42,9 @@ public class Word2VecRawTextExample {
         });
 
         log.info("Tokenize data....");
-        TokenizerFactory t = new DefaultTokenizerFactory();
-        t.setTokenPreProcessor(new TokenPreProcess() {
+        final EndingPreProcessor preProcessor = new EndingPreProcessor();
+        TokenizerFactory tokenizer = new DefaultTokenizerFactory();
+        tokenizer.setTokenPreProcessor(new TokenPreProcess() {
             @Override
             public String preProcess(String token) {
                 token = token.toLowerCase();
@@ -57,10 +57,19 @@ public class Word2VecRawTextExample {
         });
 
         log.info("Build model....");
-        Word2Vec vec = new Word2Vec.Builder().sampling(1e-5)
-                .minWordFrequency(5).batchSize(1000).useAdaGrad(false).layerSize(layerSize)
-                .iterations(3).learningRate(0.025).minLearningRate(1e-2).negativeSample(10)
-                .iterate(iter).tokenizerFactory(t).build();
+        Word2Vec vec = new Word2Vec.Builder()
+                .batchSize(1000)
+                .sampling(1e-5)
+                .minWordFrequency(5)
+                .useAdaGrad(false)
+                .layerSize(layerSize)
+                .iterations(3)
+                .learningRate(0.025)
+                .minLearningRate(1e-2)
+                .negativeSample(10)
+                .iterate(iter)
+                .tokenizerFactory(tokenizer)
+                .build();
         vec.fit();
 
         log.info("Evaluate model....");
@@ -69,12 +78,21 @@ public class Word2VecRawTextExample {
         Collection<String> similar = vec.wordsNearest("day", 20);
         log.info("Similar words to 'day' : " + similar);
 
-        BarnesHutTsne tsne = new BarnesHutTsne.Builder().setMaxIter(1000).stopLyingIteration(250)
-                .learningRate(500).useAdaGrad(false).theta(0.5).setMomentum(0.5)
-                .normalize(true).usePca(false).build();
+        log.info("Plot TSNE....");
+        BarnesHutTsne tsne = new BarnesHutTsne.Builder()
+                .setMaxIter(1000)
+                .stopLyingIteration(250)
+                .learningRate(500)
+                .useAdaGrad(false)
+                .theta(0.5)
+                .setMomentum(0.5)
+                .normalize(true)
+                .usePca(false)
+                .build();
+        vec.lookupTable().plotVocab(tsne);
 
         log.info("Save vectors....");
-        SerializationUtils.saveObject(vec,new File("vec.ser"));
+        SerializationUtils.saveObject(vec, new File("vec.ser"));
         WordVectorSerializer.writeWordVectors(vec, "words.txt");
 
         log.info("****************Example finished********************");

@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 
 /**
@@ -32,7 +33,7 @@ public class DBNLWFExample {
     public static void main(String[] args) throws Exception {
 
         log.info("Load data....");
-        DataSetIterator dataIter = new LFWDataSetIterator(1000,10000);
+        DataSetIterator dataIter = new LFWDataSetIterator(100,10000);
 
         log.info("Build model....");
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
@@ -50,7 +51,7 @@ public class DBNLWFExample {
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
-        model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
+        Collections.singletonList((IterationListener) new ScoreIterationListener(1));
 
         log.info("Train model....");
         while(dataIter.hasNext()) {

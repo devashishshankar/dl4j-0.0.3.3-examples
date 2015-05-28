@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 
 /**
@@ -42,6 +43,7 @@ public class DBNMnistReconstructExample {
                 .nIn(784)
                 .nOut(10)
                 .weightInit(WeightInit.VI)
+                .constrainGradientToUnitNorm(true)
                 .iterations(5)
                 .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
                 .learningRate(1e-1f)
@@ -51,12 +53,13 @@ public class DBNMnistReconstructExample {
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
-        model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
+        Collections.singletonList((IterationListener) new ScoreIterationListener(1));
 
         log.info("Train model....");
 
         while(iter.hasNext()) {
             DataSet mnist = iter.next();
+            mnist.normalizeZeroMeanZeroUnitVariance();
             model.fit(mnist);
         }
         iter.reset();
@@ -64,9 +67,10 @@ public class DBNMnistReconstructExample {
         log.info("Evaluate model....");
         Evaluation eval = new Evaluation();
         while(iter.hasNext()) {
-            DataSet test_data = iter.next();
-            INDArray predict2 = model.output(test_data.getFeatureMatrix());
-            eval.eval(test_data.getLabels(), predict2);
+            DataSet testData = iter.next();
+            testData.normalizeZeroMeanZeroUnitVariance();
+            INDArray predict2 = model.output(testData.getFeatureMatrix());
+            eval.eval(testData.getLabels(), predict2);
         }
 
         log.info(eval.stats());

@@ -1,6 +1,8 @@
 package org.deeplearning4j.deepbelief;
 
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
+import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
 import org.deeplearning4j.nn.conf.layers.RBM;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
@@ -19,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 
 /**
@@ -54,7 +57,10 @@ public class DBNCreateDataExample {
                 .layer(new RBM())
                 .nIn(trainingSet.numInputs())
                 .nOut(trainingSet.numOutcomes())
-                .weightInit(WeightInit.SIZE).iterations(10)
+                .weightInit(WeightInit.DISTRIBUTION)
+                .dist(new NormalDistribution(0, 1))
+                .constrainGradientToUnitNorm(true)
+                .iterations(10)
                 .activationFunction("tanh")
                 .visibleUnit(RBM.VisibleUnit.GAUSSIAN)
                 .hiddenUnit(RBM.HiddenUnit.RECTIFIED)
@@ -67,7 +73,7 @@ public class DBNCreateDataExample {
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
-        model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
+        Collections.singletonList((IterationListener) new ScoreIterationListener(1));
 
         log.info("Train model....");
         model.fit(trainingSet);
