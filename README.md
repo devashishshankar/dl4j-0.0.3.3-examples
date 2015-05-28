@@ -23,27 +23,28 @@ For more information checkout out [deeplearning4j.org](http://deeplearning4j.org
 ---
 ## Performance
 
-| **Model Name**      | **F1** | **Status**   | **Training**  |
-|---------------------|--------|--------------|---------------|
-| CNNIris             |        | Not working  | batch         |
-| CNNMnist            |        | Not working  | batch         |
-| CNNMnist2           |        | Not working  | batch         | 
-| DBNCreateData       | 0.33   | Needs Tuning | batch         |          	
-| DBNFullMnist        | 0.18   | Needs Tuning | full          |
-| DBNIris             |        | Not working  | full          |
-| DBNLWF              |        | Needs eval   | batch         |
-| DBNMnistRecontruct  | 0.017  | Needs Tuning | batch         |
-| DBNSmallMnist       | 0.02   | Needs Tuning | full          |
-| GloveRawSentence    |        |              |               |
-| MLPBackprop         |        | Not working  | batch         |
-| RBMCreateData	      | NA     | Validate     | full          |
-| RBMIris             | NA     | Validate     | full          |
-| RecurrentLSTMMnist  | NA     | Not working  | batch         |
-| RecurisveAutoEncoder| NA     | Validate     | batch         |
-| RNTNTwitter         | NA     | Finish       | batch         |
-| TSNEBarnesHut       | NA     |              | NA            |
-| TSNEStandard        | NA     | Working      | NA            |
-| Word2VecRawText     |        |              |               |
+| **Model Name**      | **Score** | **Status**   | **Training**  |
+|---------------------|-----------|--------------|---------------|
+| CNNIris             | F1 1.0    | Validate     | batch         |
+| CNNMnist            | F1        | Not working  | batch         |
+| CNNMnist2           | F1        | Not working  | batch         | 
+| DBNCreateData       | F1 0.33   | Needs Tuning | batch         |          	
+| DBNFullMnist        | F1 0.18   | Needs Tuning | full          |
+| DBNIris             | F1 1.0    | Validate     | full          |
+| DBNLWF              | F1        | Needs eval   | batch         |
+| DBNMnistRecontruct  | F1 0.017  | Needs Tuning | batch         |
+| DBNSmallMnist       | F1 0.02   | Needs Tuning | full          |
+| GloveRawSentence    | Sim 0     | Needs Tuning | batch         |
+| MLPBackprop         | F1        | Not working  | batch         |
+| RBMCreateData	      | NA        | Validate     | full          |
+| RBMIris             | NA        | Validate     | full          |
+| RecurrentLSTMMnist  | NA        | Not working  | batch         |
+| RecurisveAutoEncoder| NA        | Validate     | batch         |
+| RNTNTwitter         | NA        | Finish       | batch         |
+| TSNEBarnesHut       | NA        | Not working  | NA            |
+| TSNEStandard        | NA        | Working      | NA            |
+| Word2VecRawText     | Sim 0     | Needs Tuning | batch         |
     
-    
+
+Iris examples are classifying only on 1 prediction with perfect score - need to verify 
 

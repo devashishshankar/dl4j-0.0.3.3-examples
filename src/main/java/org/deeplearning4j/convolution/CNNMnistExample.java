@@ -56,7 +56,8 @@ public class CNNMnistExample {
                 .activationFunction("sigmoid").filterSize(7, 1, numRows, numColumns)
                 .optimizationAlgo(OptimizationAlgorithm.LBFGS).constrainGradientToUnitNorm(true)
                 .list(3).hiddenLayerSizes(new int[]{50})
-                .inputPreProcessor(0, new ConvolutionInputPreProcessor(numRows, numColumns)).preProcessor(1, new ConvolutionPostProcessor())
+                .inputPreProcessor(0, new ConvolutionInputPreProcessor(numRows, numColumns))
+                .preProcessor(1, new ConvolutionPostProcessor())
                 .override(0, new ConfOverride() {
                     public void overrideLayer(int i, NeuralNetConfiguration.Builder builder) {
                         builder.layer(new ConvolutionLayer());

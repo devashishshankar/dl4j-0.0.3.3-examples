@@ -30,8 +30,6 @@ import java.util.Collections;
 /**
  * Created by agibsonccc on 9/12/14.
  *
- * ? Output layer not a instance of output layer returning ?
- *
  */
 public class DBNIrisExample {
 

@@ -63,9 +63,9 @@ public class CNNIrisExample {
                 .constrainGradientToUnitNorm(true)
                 .dropOut(0.5)
                 .list(2)
-                .hiddenLayerSizes(9)
+                .hiddenLayerSizes(4)
                 .inputPreProcessor(0, new ConvolutionInputPreProcessor(numRows, numColumns))
-                .preProcessor(1, new ConvolutionPostProcessor())
+                .preProcessor(0, new ConvolutionPostProcessor())
                 .override(0, new ConfOverride() {
                     public void overrideLayer(int i, NeuralNetConfiguration.Builder builder) {
                         builder.layer(new ConvolutionLayer());
