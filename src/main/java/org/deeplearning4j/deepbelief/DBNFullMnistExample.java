@@ -45,6 +45,7 @@ public class DBNFullMnistExample {
                 .nOut(10)
                 .weightInit(WeightInit.DISTRIBUTION)
                 .dist(new NormalDistribution(0, 1))
+                .constrainGradientToUnitNorm(true)
                 .iterations(5)
                 .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
                 .learningRate(1e-1f)

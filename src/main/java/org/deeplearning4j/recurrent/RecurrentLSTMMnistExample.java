@@ -38,6 +38,7 @@ public class RecurrentLSTMMnistExample {
                 .layer(new LSTM())
                 .optimizationAlgo(OptimizationAlgorithm.LBFGS)
                 .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
+                .constrainGradientToUnitNorm(true)
                 .nIn(784).nOut(784).build();
         Layer layer = LayerFactories.getFactory(conf.getLayer()).create(conf);
 

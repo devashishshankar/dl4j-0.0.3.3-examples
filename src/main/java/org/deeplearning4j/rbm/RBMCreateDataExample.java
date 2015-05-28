@@ -51,6 +51,7 @@ public class RBMCreateDataExample {
                 .nIn(trainingSet.numInputs())
                 .nOut(trainingSet.numOutcomes())
                 .weightInit(WeightInit.SIZE)
+                .constrainGradientToUnitNorm(true)
                 .iterations(3)
                 .activationFunction("tanh")
                 .visibleUnit(RBM.VisibleUnit.GAUSSIAN)

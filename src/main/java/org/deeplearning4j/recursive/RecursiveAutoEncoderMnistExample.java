@@ -38,6 +38,7 @@ public class RecursiveAutoEncoderMnistExample {
                 .momentum(0.9f)
                 .corruptionLevel(0.3)
                 .weightInit(WeightInit.VI)
+                .constrainGradientToUnitNorm(true)
                 .iterations(10)
                 .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
                 .optimizationAlgo(OptimizationAlgorithm.ITERATION_GRADIENT_DESCENT)

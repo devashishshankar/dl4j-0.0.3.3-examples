@@ -43,6 +43,7 @@ public class DBNMnistReconstructExample {
                 .nIn(784)
                 .nOut(10)
                 .weightInit(WeightInit.VI)
+                .constrainGradientToUnitNorm(true)
                 .iterations(5)
                 .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
                 .learningRate(1e-1f)
