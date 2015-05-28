@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * Created by agibsonccc on 9/20/14.
  *
+ * Dimensionality reduction for high-dimension datasets
  * Pass in words.txt at CLI
  *
  */
@@ -44,7 +45,7 @@ public class TSNEStandardExample {
         for(int i = 0; i < cache.numWords(); i++)
             cacheList.add(cache.wordAtIndex(i));
 
-        log.info("Plot TSNE....");
+        log.info("Store TSNE Coordinates for Plotting....");
         tsne.plot(weights,2,cacheList,"target/archive-tmp/tsne-create-data-coords.csv");
     }
 

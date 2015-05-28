@@ -31,9 +31,6 @@ public class RecurrentLSTMMnistExample {
 
         log.info("Loading data...");
         MnistDataFetcher fetcher = new MnistDataFetcher(true);
-        fetcher.fetch(10);
-        DataSet d2 = fetcher.next();
-        INDArray input = d2.getFeatureMatrix();
 
         log.info("Building model...");
         NeuralNetConfiguration conf = new NeuralNetConfiguration.Builder()
@@ -43,10 +40,13 @@ public class RecurrentLSTMMnistExample {
                 .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
                 .nIn(784).nOut(784).build();
         Layer layer = LayerFactories.getFactory(conf.getLayer()).create(conf);
-        Collections.singletonList((IterationListener) new ScoreIterationListener(1));
 
         log.info("Training model...");
-        layer.fit(input);
+        for(int i=0 ; i < 100; i++) {
+            fetcher.fetch(100);
+            DataSet mnist = fetcher.next();
+            layer.fit(mnist.getFeatureMatrix());
+        }
 
     // Generative Model - unsupervised and its time series based which requires different evaluation technique
 

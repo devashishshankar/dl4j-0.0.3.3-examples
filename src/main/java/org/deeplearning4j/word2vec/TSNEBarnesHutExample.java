@@ -1,5 +1,6 @@
 package org.deeplearning4j.word2vec;
 
+import org.apache.commons.io.FileUtils;
 import org.deeplearning4j.models.embeddings.WeightLookupTable;
 import org.deeplearning4j.plot.BarnesHutTsne;
 import org.deeplearning4j.util.SerializationUtils;
@@ -11,7 +12,8 @@ import java.io.File;
 /**
  * Created by agibsonccc on 10/9/14.
  *
- * BanesHut better for large real-world datasets
+ * Barnes-Hut better for large real-world datasets
+ * Pass in words.txt at CLI
  */
 public class TSNEBarnesHutExample {
 
@@ -20,11 +22,11 @@ public class TSNEBarnesHutExample {
     public static void main(String[] args) throws Exception {
 
         log.info("Load & vectorize data....");
-       WeightLookupTable pair = SerializationUtils.readObject(new File(args[0]));
+        WeightLookupTable pair = SerializationUtils.readObject(new File(args[0]));
 
         log.info("Build model....");
         BarnesHutTsne tsne = new BarnesHutTsne.Builder()
-                .setMaxIter(1000)
+                .setMaxIter(10000)
                 .normalize(true)
                 .stopLyingIteration(250)
                 .learningRate(500)
@@ -34,7 +36,7 @@ public class TSNEBarnesHutExample {
                 .usePca(false)
                 .build();
 
-        log.info("Plot TSNE....");
+        log.info("Plot Vocab TSNE....");
         pair.plotVocab(tsne);
 
     }

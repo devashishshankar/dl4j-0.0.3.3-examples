@@ -46,7 +46,7 @@ public class RBMIrisExample {
         log.info("Load data....");
         DataSetIterator iter = new IrisDataSetIterator(150, 150);
         DataSet iris = iter.next();
-        iris.scale();
+        iris.normalizeZeroMeanZeroUnitVariance();
 
         log.info("Build model....");
         NeuralNetConfiguration conf = new NeuralNetConfiguration.Builder()
@@ -72,7 +72,7 @@ public class RBMIrisExample {
         model.setIterationListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
 
         log.info("Train model....");
-        model.fit((INDArray) iris);
+        model.fit(iris.getFeatureMatrix());
 
         // Single layer just learns features and can't be supervised. Thus cannot be evaluated.
     }

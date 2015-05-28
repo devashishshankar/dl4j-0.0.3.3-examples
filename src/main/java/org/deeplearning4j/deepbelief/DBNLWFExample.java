@@ -33,7 +33,7 @@ public class DBNLWFExample {
     public static void main(String[] args) throws Exception {
 
         log.info("Load data....");
-        DataSetIterator dataIter = new LFWDataSetIterator(1000,10000);
+        DataSetIterator dataIter = new LFWDataSetIterator(100,10000);
 
         log.info("Build model....");
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()

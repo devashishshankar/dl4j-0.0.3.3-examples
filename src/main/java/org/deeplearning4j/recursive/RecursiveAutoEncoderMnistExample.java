@@ -50,7 +50,7 @@ public class RecursiveAutoEncoderMnistExample {
         log.info("Training model...");
 
         for(int i=0 ; i < 100; i++) {
-            fetcher.fetch(10);
+            fetcher.fetch(100);
             DataSet data = fetcher.next();
             INDArray input = data.getFeatureMatrix();
             model.fit(input);
