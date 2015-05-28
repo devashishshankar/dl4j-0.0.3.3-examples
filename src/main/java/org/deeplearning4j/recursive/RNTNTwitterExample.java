@@ -18,9 +18,12 @@ import org.deeplearning4j.nn.layers.feedforward.autoencoder.recursive.Tree;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
+import org.deeplearning4j.text.corpora.treeparser.TreeParser;
 import org.deeplearning4j.text.corpora.treeparser.TreeVectorizer;
 import org.deeplearning4j.text.invertedindex.InvertedIndex;
 import org.deeplearning4j.text.invertedindex.LuceneInvertedIndex;
+import org.deeplearning4j.text.sentenceiterator.CollectionSentenceIterator;
+import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
 import org.deeplearning4j.text.sentenceiterator.labelaware.LabelAwareFileSentenceIterator;
 import org.deeplearning4j.text.sentenceiterator.labelaware.LabelAwareSentenceIterator;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
@@ -53,14 +56,14 @@ import java.util.List;
 public class RNTNTwitterExample {
 
     private static final Logger log = LoggerFactory.getLogger(RNTNTwitterExample.class);
-    String fileName = "resources/sentiment-tweets.small.csv";
-//    String fileName = "tweets_clean.txt";
+    private static String fileName = "resources/sentiment-tweets.small.csv";
+//    private static String fileName = "tweets_clean.txt";
 
     private static int batchSize = 10;
     private static int numSamples = 100;
     private static int labelColumn = 1;
 
-    static DataSetIterator loadData(String fileName)  throws Exception {
+    static DataSetIterator loadData()  throws Exception {
         InputStream lwfIs = new FileInputStream(new File(fileName));
 //        InputStream lwfIs = new ClassPathResource(fileName).getFile();
         DataSetIterator dataIter = new CSVDataSetIterator(batchSize, numSamples, lwfIs, labelColumn);
@@ -70,57 +73,65 @@ public class RNTNTwitterExample {
         return dataIter;
     }
 
-    static Word2Vec buildVectors() {
-
-        //        Pair<InMemoryLookupTable,VocabCache> vectors = WordVectorSerializer.loadTxt(new File(fileName));
+    static Word2Vec buildVectors(DataSetIterator dataIter) throws Exception {
         // use word2vec as a lookup - feed rntn consitnuency tables - parse - sentence iterator that iterates through corpus
         // get corpus and feed into sentence iterator, fit vectors, loop and fit rntn
 
+//        Pair<InMemoryLookupTable,VocabCache> vectors = WordVectorSerializer.loadTxt(new File(fileName));
+//        InMemoryLookupCache cache = (InMemoryLookupCache) vectors.getSecond();
+
+//        LabelAwareSentenceIterator iter = new LabelAwareFileSentenceIterator(new File(fileName)); ?
+//        SentenceIterator sentenceIter = new CollectionSentenceIterator(Arrays.asList(sentence)); ?
 
 
-//        LabelAwareSentenceIterator iter = new LabelAwareFileSentenceIterator(new File(fileName));
+        Word2Vec featureVec;
+        VocabCache cache = new InMemoryLookupCache();
+        TokenizerFactory tokenizerFactory = new UimaTokenizerFactory(false);
+        WeightLookupTable lookupTable = new InMemoryLookupTable.Builder().cache(cache).vectorLength(100).build();
 
-//        RNTN t = new RNTN.Builder()
-//                .setActivationFunction(Activations.hardTanh()).setFeatureVectors(fetcher.getVec())
-//                .setUseTensors(true).build();
-//
-//        TreeVectorizer vectorizer = new TreeVectorizer(new TreeParser());
-        TreeVectorizer vectorizer = new TreeVectorizer();
+        InvertedIndex index = new LuceneInvertedIndex.Builder().indexDir(dataIter).cache(cache).build(); // or is this lookup table
 
-        Word2Vec vec;
-
-        vec = new Word2Vec.Builder()
-                .vocabCache(cache).index(index)
-                .iterate(iter).tokenizerFactory(tokenizerFactory)
-                .lookupTable(lookupTable).build();
-        vec.fit();
-
+        featureVec = new Word2Vec.Builder()
+                .vocabCache(cache)
+                .index(index)
+                .iterate(dataIter)
+                .tokenizerFactory(tokenizerFactory)
+                .lookupTable(lookupTable)
+                .build();
+        featureVec.fit();
 
         TokenizerFactory tokenizerFactory = new UimaTokenizerFactory(false);
         VocabCache cache = new InMemoryLookupCache();
         InvertedIndex index = new LuceneInvertedIndex.Builder()
                 .indexDir(new File("rntn-index")).cache(cache).build();
-        WeightLookupTable lookupTable = new InMemoryLookupTable.Builder().cache(cache)
-                .vectorLength(100).build();
+//        WeightLookupTable lookupTable = new InMemoryLookupTable.Builder().cache(cache)
+//                .vectorLength(100).build();
     }
 
-    static RNTN buildModel(Word2Vec vec) {
+    static RNTN buildModel(Word2Vec featureVec) {
+//        RNTN t = new RNTN.Builder()
+//                .setActivationFunction(Activations.hardTanh()).setFeatureVectors(fetcher.getVec())
+//                .setUseTensors(true).build();
+
         RNTN rntn = new RNTN.Builder()
                 .setActivationFunction("tanh")
                 .setAdagradResetFrequency(1)
                 .setCombineClassification(true)
-                .setFeatureVectors(vec)
+                .setFeatureVectors(featureVec)
                 .setRandomFeatureVectors(false)
                 .setUseTensors(false)
                 .build();
         return rntn;
     }
 
-    static RNTN trainModel(DataSetIterator dataIter, Word2Vec vec, RNTN model){
+    static RNTN trainModel(DataSetIterator dataIter, RNTN model){
 //      train model
+        TreeVectorizer vectorizer = new TreeVectorizer(new TreeParser());
+
         while(dataIter.hasNext()) {
         // this is looped with fit
-            List<Tree> trees = vec.getTreesWithLabels(dataIter.nextSentence(), dataIter.currentLabel(), Arrays.asList("0", "1", "2", "3", "4"));
+            // TODO - change data passed into sentence iterator?
+            List<Tree> trees = vectorizer.getTreesWithLabels(dataIter.nextSentence(), dataIter.currentLabel(), Arrays.asList("0", "1", "2", "3", "4"));
             model.fit(trees);
         }
         return model;
@@ -150,7 +161,7 @@ public class RNTNTwitterExample {
 
         log.info("Load & vectorize data....");
         DataSetIterator dataIter = loadData();
-        Word2Vec vec = buildVectors();
+        Word2Vec vec = buildVectors(dataIter);
 
         log.info("Build model....");
         RNTN model = buildModel(vec);
