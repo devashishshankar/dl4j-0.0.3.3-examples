@@ -83,6 +83,13 @@ public class DBNIrisExample {
         log.info("Evaluate model....");
         Evaluation eval = new Evaluation();
         INDArray output = model.output(test.getFeatureMatrix());
+
+        for (int i = 0; i < output.rows(); i++) {
+            String actual = train.getLabels().getRow(i).toString().trim();
+            String predicted = output.getRow(i).toString().trim();
+            log.info("actual " + actual + " vs predicted " + predicted);
+        }
+
         eval.eval(test.getLabels(), output);
         log.info(eval.stats());
         log.info("****************Example finished********************");
