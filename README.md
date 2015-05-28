@@ -31,7 +31,7 @@ For more information, check out [deeplearning4j.org](http://deeplearning4j.org/)
 | DBNCreateData       | F1 0.33   | Needs Tuning | batch         |          	
 | DBNFullMnist        | F1 0.18   | Needs Tuning | full          |
 | DBNIris             | F1 1.0    | Validate     | full          |
-| DBNLWF              | F1        | Needs eval   | batch         |
+| DBNLWF              | F1 0.0    | Needs Tuning | batch         |
 | DBNMnistRecontruct  | F1 0.017  | Needs Tuning | batch         |
 | DBNSmallMnist       | F1 0.02   | Needs Tuning | full          |
 | GloveRawSentence    | Sim 0     | Needs Tuning | batch         |
