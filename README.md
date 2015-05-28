@@ -14,11 +14,11 @@ Repository of Deeplearning4J neural net examples:
 
 ---
 ## Development
-We are in progress of developing and tunning these examples. If you notice issues please log and if you want to contribute submit a pull request. Input is definitely welcome.
+We are in progress of developing and tuning these examples. If you notice issues, please log, and if you want to contribute, submit a pull request. Input is definitely welcome.
 
 ---
 ## Documentation
-For more information checkout out [deeplearning4j.org](http://deeplearning4j.org/) and [JavaDocs](http://deeplearning4j.org/doc/).
+For more information, check out [deeplearning4j.org](http://deeplearning4j.org/) and [JavaDocs](http://deeplearning4j.org/doc/).
 
 ---
 ## Performance
