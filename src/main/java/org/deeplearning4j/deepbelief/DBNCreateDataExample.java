@@ -1,6 +1,8 @@
 package org.deeplearning4j.deepbelief;
 
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
+import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
 import org.deeplearning4j.nn.conf.layers.RBM;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
@@ -55,7 +57,9 @@ public class DBNCreateDataExample {
                 .layer(new RBM())
                 .nIn(trainingSet.numInputs())
                 .nOut(trainingSet.numOutcomes())
-                .weightInit(WeightInit.SIZE)
+                .weightInit(WeightInit.DISTRIBUTION)
+                .dist(new NormalDistribution(0, 1))
+                .constrainGradientToUnitNorm(true)
                 .iterations(10)
                 .activationFunction("tanh")
                 .visibleUnit(RBM.VisibleUnit.GAUSSIAN)
