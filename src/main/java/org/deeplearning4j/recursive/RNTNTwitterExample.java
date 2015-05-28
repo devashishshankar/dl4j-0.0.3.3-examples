@@ -32,8 +32,11 @@ import org.nd4j.linalg.dataset.api.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,29 +58,28 @@ public class RNTNTwitterExample {
 
     private static int batchSize = 10;
     private static int numSamples = 100;
+    private static int labelColumn = 1;
 
-    static DataSetIterator loadData()  throws Exception {
-        CSVDataSetIterator(batchSize, numSamples, new File(fileName), ...);
-//        Pair<InMemoryLookupTable,VocabCache> vectors = WordVectorSerializer.loadTxt(new File(fileName));
+    static DataSetIterator loadData(String fileName)  throws Exception {
+        InputStream lwfIs = new FileInputStream(new File(fileName));
+//        InputStream lwfIs = new ClassPathResource(fileName).getFile();
+        DataSetIterator dataIter = new CSVDataSetIterator(batchSize, numSamples, lwfIs, labelColumn);
+//        CSVRecordReader data = new CSVRecordReader().initialize(new FileSplit(new File(fileName)));
+//        Collection<Writable> next = data.next();
+
+        return dataIter;
+    }
+
+    static Word2Vec buildVectors() {
+
+        //        Pair<InMemoryLookupTable,VocabCache> vectors = WordVectorSerializer.loadTxt(new File(fileName));
         // use word2vec as a lookup - feed rntn consitnuency tables - parse - sentence iterator that iterates through corpus
         // get corpus and feed into sentence iterator, fit vectors, loop and fit rntn
 
-        //      normalize, shape & split data
-//        DataSet all = iter.next();
-//        all.scale();
-//        all.shuffle();
-//        DataSetIterator allIter = new ListDataSetIterator(all.asList(),100);
 
-        CSVRecordReader data = new CSVRecordReader();
-        data.initialize(new FileSplit(new File(fileName)));
-        Collection<Writable> next = data.next();
 
 //        LabelAwareSentenceIterator iter = new LabelAwareFileSentenceIterator(new File(fileName));
 
-        DataSetIterator dataIter = new DataSetIterator(batchSize, numTrainSamples);
-        return dataIter;
-
-    static Word2Vec buildVectors() {
 //        RNTN t = new RNTN.Builder()
 //                .setActivationFunction(Activations.hardTanh()).setFeatureVectors(fetcher.getVec())
 //                .setUseTensors(true).build();
