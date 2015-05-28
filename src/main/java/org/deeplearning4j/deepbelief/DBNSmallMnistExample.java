@@ -7,6 +7,7 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
+import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
 import org.deeplearning4j.nn.conf.layers.RBM;
 import org.deeplearning4j.nn.conf.override.ClassifierOverride;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
@@ -33,21 +34,22 @@ public class DBNSmallMnistExample {
     public static void main(String[] args) throws Exception {
 
         log.info("Load data....");
-        DataSetIterator iter = new MultipleEpochsIterator(10, new MnistDataSetIterator(1000,1000));
+        DataSetIterator iter = new MultipleEpochsIterator(5, new MnistDataSetIterator(1000,1000));
 
         log.info("Build model....");
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .layer(new RBM())
                 .nIn(784)
-                .nOut(10)
-                .weightInit(WeightInit.VI)
-                .iterations(5)
+                .nOut(10).constrainGradientToUnitNorm(true)
+                .weightInit(WeightInit.DISTRIBUTION).dist(new UniformDistribution(1e-3,1e-1))
+                .iterations(1)
                 .lossFunction(LossFunctions.LossFunction.RMSE_XENT)
                 .learningRate(1e-1f)
                 .list(4)
-                .hiddenLayerSizes(new int[]{600, 500, 400})
-                .override(3, new ClassifierOverride(3))
+                .hiddenLayerSizes(600, 500, 400)
+                .override(3, new ClassifierOverride())
                 .build();
+
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
         model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));

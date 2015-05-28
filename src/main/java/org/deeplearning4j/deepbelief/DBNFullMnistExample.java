@@ -53,7 +53,7 @@ public class DBNFullMnistExample {
                 .optimizationAlgo(OptimizationAlgorithm.CONJUGATE_GRADIENT)
                 .list(4)
                 .hiddenLayerSizes(new int[]{500, 250, 200})
-                .override(3, new ClassifierOverride(3))
+                .override(3, new ClassifierOverride())
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
