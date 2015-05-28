@@ -35,16 +35,16 @@ For more information checkout out [deeplearning4j.org](http://deeplearning4j.org
 | DBNMnistRecontruct  | F1 0.017  | Needs Tuning | batch         |
 | DBNSmallMnist       | F1 0.02   | Needs Tuning | full          |
 | GloveRawSentence    | Sim 0     | Needs Tuning | batch         |
-| MLPBackprop         | F1        | Not working  | batch         |
+| MLPBackprop         | F1 0.16   | Needs Tuning | batch         |
 | RBMCreateData	      | NA        | Validate     | full          |
 | RBMIris             | NA        | Validate     | full          |
-| RecurrentLSTMMnist  | NA        | Not working  | batch         |
-| RecurisveAutoEncoder| NA        | Validate     | batch         |
-| RNTNTwitter         | NA        | Finish       | batch         |
+| RecurrentLSTMMnist  | NA        | Validate     | batch         |
+| RecurisveAutoEncoder| NA        | Not working  | batch         |
+| RNTNTwitter         | NA        | Develop      | batch         |
 | TSNEBarnesHut       | NA        | Not working  | NA            |
 | TSNEStandard        | NA        | Working      | NA            |
 | Word2VecRawText     | Sim 0     | Needs Tuning | batch         |
     
 
-Iris examples are classifying only on 1 prediction with perfect score - need to verify 
-
+CNN & DBN Iris examples are classifying only on 1 prediction with perfect score - need to verify
+ MLP with backward true is showing all values and coming out with more realistic scores
