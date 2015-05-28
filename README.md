@@ -39,7 +39,7 @@ For more information checkout out [deeplearning4j.org](http://deeplearning4j.org
 | RBMCreateData	      | NA        | Validate     | full          |
 | RBMIris             | NA        | Validate     | full          |
 | RecurrentLSTMMnist  | NA        | Validate     | batch         |
-| RecurisveAutoEncoder| NA        | Not working  | batch         |
+| RecursiveAutoEncoder| NA        | Validate     | batch         |
 | RNTNTwitter         | NA        | Develop      | batch         |
 | TSNEBarnesHut       | NA        | Not working  | NA            |
 | TSNEStandard        | NA        | Working      | NA            |
