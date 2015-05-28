@@ -10,14 +10,16 @@ import java.io.File;
 
 /**
  * Created by agibsonccc on 10/9/14.
+ *
+ * BanesHut better for large real-world datasets
  */
-public class TSNEReadTextExample {
+public class TSNEBarnesHutExample {
 
-    private static Logger log = LoggerFactory.getLogger(TSNEReadTextExample.class);
+    private static Logger log = LoggerFactory.getLogger(TSNEBarnesHutExample.class);
 
     public static void main(String[] args) throws Exception {
 
-        log.info("Load data....");
+        log.info("Load & vectorize data....");
        WeightLookupTable pair = SerializationUtils.readObject(new File(args[0]));
 
         log.info("Build model....");

@@ -15,10 +15,13 @@ import java.util.List;
 
 /**
  * Created by agibsonccc on 9/20/14.
+ *
+ * Pass in words.txt at CLI
+ *
  */
-public class TSNECreateDataExample {
+public class TSNEStandardExample {
 
-    private static Logger log = LoggerFactory.getLogger(TSNECreateDataExample.class);
+    private static Logger log = LoggerFactory.getLogger(TSNEStandardExample.class);
 
     public static void main(String[] args) throws Exception  {
 
@@ -33,7 +36,7 @@ public class TSNECreateDataExample {
                 .usePca(false)
                 .build();
 
-        log.info("Vectorize data....");
+        log.info("Load & Vectorize data....");
         Pair<InMemoryLookupTable,VocabCache> vectors = WordVectorSerializer.loadTxt(new File(args[0]));
         VocabCache cache = vectors.getSecond();
         INDArray weights = vectors.getFirst().getSyn0();
@@ -42,7 +45,7 @@ public class TSNECreateDataExample {
             cacheList.add(cache.wordAtIndex(i));
 
         log.info("Plot TSNE....");
-        tsne.plot(weights,2,cacheList);
+        tsne.plot(weights,2,cacheList,"target/archive-tmp/tsne-create-data-coords.csv");
     }
 
 
