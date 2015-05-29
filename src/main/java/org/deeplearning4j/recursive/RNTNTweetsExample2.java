@@ -44,7 +44,7 @@ public class RNTNTweetsExample2 {
 
         for (String line : lines) {
             String cols[] = line.split(",");
-            labels.add(cols[2]);
+            labels.add(cols[1]);
             sentences.add(cols[3]);
         }
         sentenceIter = new CollectionSentenceIterator(sentences);
