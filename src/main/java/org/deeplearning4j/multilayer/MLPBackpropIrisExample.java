@@ -67,7 +67,7 @@ public class MLPBackpropIrisExample {
                 .list(2)
                 .hiddenLayerSizes(new int[]{3})
                 .backward(true)
-                .override(1,new ClassifierOverride(1))
+                .override(1,new ClassifierOverride())
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();

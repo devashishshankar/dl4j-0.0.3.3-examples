@@ -26,8 +26,8 @@ For more information, check out [deeplearning4j.org](http://deeplearning4j.org/)
 | **Model Name**      | **Score** | **Status**   | **Training**  |
 |---------------------|-----------|--------------|---------------|
 | CNNIris             | F1 0.14   | Tune         | batch         |
-| CNNMnist            | F1        | Not working  | batch         |
-| CNNMnist2           | F1        | Not working  | batch         | 
+| CNNMnist            | F1 0.0    | Validate     | batch         |
+| CNNMnist2           | F1 0.06   | Tune         | batch         |
 | DBNCreateData       | F1 0.33   | Tune         | batch         |          	
 | DBNFullMnist        | F1 0.18   | Tune         | full          |
 | DBNIris             | F1 1.0    | Validate     | full          |
@@ -47,5 +47,3 @@ For more information, check out [deeplearning4j.org](http://deeplearning4j.org/)
 | Word2VecRawText     | Sim 0     | Tune         | batch         |
     
 
-CNN & DBN Iris examples are classifying only on 1 prediction with perfect score - need to verify
- MLP with backward true is showing all values and coming out with more realistic scores
