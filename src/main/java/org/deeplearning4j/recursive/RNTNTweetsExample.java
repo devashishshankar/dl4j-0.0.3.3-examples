@@ -51,6 +51,7 @@ public class RNTNTweetsExample {
                 .setRandomFeatureVectors(false)
                 .setUseTensors(false).build();
         int count = 0;
+
         while(iter.hasNext()) {
             String next = iter.nextSentence();
             List<Tree> treeList = trees.getTreesWithLabels(next, Arrays.asList(labels.get(count++)));

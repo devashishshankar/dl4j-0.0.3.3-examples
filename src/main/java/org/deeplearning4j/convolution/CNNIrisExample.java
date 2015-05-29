@@ -73,7 +73,7 @@ public class CNNIrisExample {
                         builder.featureMapSize(2, 2);
                     }
                 })
-                .override(1, new ClassifierOverride(1))
+                .override(1, new ClassifierOverride())
                 .build();
 
         log.info("Build model....");

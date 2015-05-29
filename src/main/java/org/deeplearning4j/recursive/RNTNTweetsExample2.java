@@ -1,48 +1,21 @@
 package org.deeplearning4j.recursive;
 
-import com.sun.xml.internal.xsom.impl.scd.Iterators;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.canova.api.records.reader.impl.CSVRecordReader;
-import org.canova.api.split.FileSplit;
-import org.canova.api.writable.Writable;
-import org.deeplearning4j.berkeley.Pair;
-import org.deeplearning4j.datasets.iterator.CSVDataSetIterator;
-import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
-import org.deeplearning4j.eval.Evaluation;
-import org.deeplearning4j.models.embeddings.WeightLookupTable;
-import org.deeplearning4j.models.embeddings.inmemory.InMemoryLookupTable;
-import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.rntn.RNTN;
 import org.deeplearning4j.models.rntn.RNTNEval;
 import org.deeplearning4j.models.word2vec.Word2Vec;
-import org.deeplearning4j.models.word2vec.wordstore.VocabCache;
-import org.deeplearning4j.models.word2vec.wordstore.inmemory.InMemoryLookupCache;
 import org.deeplearning4j.nn.layers.feedforward.autoencoder.recursive.Tree;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
-import org.deeplearning4j.text.corpora.treeparser.TreeParser;
 import org.deeplearning4j.text.corpora.treeparser.TreeVectorizer;
-import org.deeplearning4j.text.invertedindex.InvertedIndex;
-import org.deeplearning4j.text.invertedindex.LuceneInvertedIndex;
 import org.deeplearning4j.text.sentenceiterator.CollectionSentenceIterator;
 import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
-import org.deeplearning4j.text.sentenceiterator.labelaware.LabelAwareFileSentenceIterator;
-import org.deeplearning4j.text.sentenceiterator.labelaware.LabelAwareSentenceIterator;
-import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
-import org.deeplearning4j.text.tokenization.tokenizerfactory.UimaTokenizerFactory;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.dataset.api.DataSet;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.factory.Nd4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.*;
 import java.util.*;
 
 
@@ -53,14 +26,14 @@ import java.util.*;
  *
  */
 
-public class RNTNTwitterExample2 {
+public class RNTNTweetsExample2 {
 
-    private static final Logger log = LoggerFactory.getLogger(RNTNTwitterExample2.class);
+    private static final Logger log = LoggerFactory.getLogger(RNTNTweetsExample2.class);
 
 //    private static String fileName = "tweets_clean.txt";
     private static SentenceIterator sentenceIter;
     private static TreeVectorizer vectorizer;
-    private static String fileName = "sentiment-tweets.small.csv";
+    private static String fileName = "sentiment-tweets-small.csv";
     private static int batchSize = 1000;
     private static List<String> labels = new ArrayList<>();
 
@@ -160,7 +133,7 @@ public class RNTNTwitterExample2 {
 
     public static void main(String[] args) throws Exception {
 
-        new RNTNTwitterExample2().exec(args);
+        new RNTNTweetsExample2().exec(args);
 
     }
 
