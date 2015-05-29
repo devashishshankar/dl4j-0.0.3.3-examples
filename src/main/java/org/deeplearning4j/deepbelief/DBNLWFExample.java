@@ -3,6 +3,7 @@ package org.deeplearning4j.deepbelief;
 
 import org.deeplearning4j.datasets.iterator.DataSetIterator;
 import org.deeplearning4j.datasets.iterator.impl.LFWDataSetIterator;
+import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
@@ -14,6 +15,7 @@ import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.plot.iterationlistener.NeuralNetPlotterIterationListener;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
@@ -58,10 +60,15 @@ public class DBNLWFExample {
             DataSet next = dataIter.next();
             next.scale();
             model.fit(next);
-
         }
 
-
+        log.info("Evaluate model....");
+        dataIter = new LFWDataSetIterator(100,100);
+        DataSet dataSet = dataIter.next();
+        Evaluation eval = new Evaluation();
+        INDArray output = model.output(dataSet.getFeatureMatrix());
+        eval.eval(dataSet.getLabels(), output);
+        log.info(eval.stats());
 
     }
 
