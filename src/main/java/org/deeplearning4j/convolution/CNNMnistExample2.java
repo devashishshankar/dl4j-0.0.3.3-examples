@@ -72,7 +72,7 @@ public class CNNMnistExample2 {
                 .nIn(numRows * numColumns)
                 .nOut(10)
                 .batchSize(batchSize)
-                .iterations(100)
+                .iterations(10)
                 .weightInit(WeightInit.ZERO)
                 .activationFunction(activationFunc)
                 .filterSize(batchSize, 1, numRows, numColumns)
@@ -95,7 +95,7 @@ public class CNNMnistExample2 {
                         builder.layer(new SubsamplingLayer());
                     }
                 })
-                .override(2, new ClassifierOverride(2))
+                .override(2, new ClassifierOverride())
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();

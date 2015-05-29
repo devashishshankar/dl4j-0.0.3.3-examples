@@ -22,8 +22,10 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by willow on 5/11/15.
@@ -37,24 +39,29 @@ public class CNNMnistExample {
         final int numRows = 28;
         final int numColumns = 28;
         int batchSize = 10;
+        DataSet mnist;
+        SplitTestAndTrain trainTest;
+        DataSet trainInput;
+        List<INDArray> testInput = new ArrayList<>();
+        List<INDArray> testLabels = new ArrayList<>();
+
 
         log.info("Load data....");
-        DataSetIterator mnist = new MnistDataSetIterator(100,100);
-        DataSet all = mnist.next();
-        all.normalizeZeroMeanZeroUnitVariance();
+        DataSetIterator mnistIter = new MnistDataSetIterator(100,1000);
 
         log.info("Split data....");
-        SplitTestAndTrain trainTest = all.splitTestAndTrain(90); // train set that is the result
-        DataSet trainInput = trainTest.getTrain(); // get feature matrix and labels for training
-        INDArray testInput = trainTest.getTest().getFeatureMatrix();
-        INDArray testLabels = trainTest.getTest().getLabels();
 
         log.info("Build model....");
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .nIn(numRows * numColumns).nOut(10).batchSize(batchSize)
-                .iterations(4).weightInit(WeightInit.UNIFORM)
-                .activationFunction("sigmoid").filterSize(7, 1, numRows, numColumns)
-                .optimizationAlgo(OptimizationAlgorithm.LBFGS).constrainGradientToUnitNorm(true)
+                .nIn(numRows * numColumns)
+                .nOut(10)
+                .batchSize(batchSize)
+                .iterations(4)
+                .weightInit(WeightInit.UNIFORM)
+                .activationFunction("sigmoid")
+                .filterSize(7, 1, numRows, numColumns)
+                .optimizationAlgo(OptimizationAlgorithm.LBFGS)
+                .constrainGradientToUnitNorm(true)
                 .list(3).hiddenLayerSizes(new int[]{50})
                 .inputPreProcessor(0, new ConvolutionInputPreProcessor(numRows, numColumns))
                 .preProcessor(1, new ConvolutionPostProcessor())
@@ -75,12 +82,23 @@ public class CNNMnistExample {
 
         log.info("Train model....");
         model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(1)));
-        model.fit(trainInput);
+        while(mnistIter.hasNext()) {
+            mnist = mnistIter.next();
+            mnist.normalizeZeroMeanZeroUnitVariance();
+            trainTest = mnist.splitTestAndTrain(90); // train set that is the result
+            trainInput = trainTest.getTrain(); // get feature matrix and labels for training
+            testInput.add(trainTest.getTest().getFeatureMatrix());
+            testLabels.add(trainTest.getTest().getLabels());
+            model.fit(trainInput);
+        }
 
         log.info("Evaluate model....");
         Evaluation eval = new Evaluation();
-        INDArray output = model.output(testInput);
-        eval.eval(testLabels, output);
+        for(int i = 0; i < testInput.size(); i++) {
+            INDArray output = model.output(testInput.get(i));
+            eval.eval(testLabels.get(i), output);
+        }
+
         log.info(eval.stats());
         log.info("****************Example finished********************");
 
