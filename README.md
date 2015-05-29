@@ -26,11 +26,11 @@ For more information, check out [deeplearning4j.org](http://deeplearning4j.org/)
 | **Model Name**      | **Score** | **Status**   | **Training**  |
 |---------------------|-----------|--------------|---------------|
 | CNNIris             | F1 0.14   | Tune         | batch         |
-| CNNMnist            | F1 0.0    | Validate     | batch         |
+| CNNMnist            | F1 0.013  | Tune         | batch         |
 | CNNMnist2           | F1 0.06   | Tune         | batch         |
 | DBNCreateData       | F1 0.33   | Tune         | batch         |          	
 | DBNFullMnist        | F1 0.18   | Tune         | full          |
-| DBNIris             | F1 1.0    | Validate     | full          |
+| DBNIris             | F1 0.15   | Tune         | full          |
 | DBNLWF              | F1 0.0    | Tune         | batch         |
 | DBNMnistRecontruct  | F1 0.017  | Tune         | batch         |
 | DBNSmallMnist       | F1 0.02   | Tune         | full          |
@@ -43,7 +43,7 @@ For more information, check out [deeplearning4j.org](http://deeplearning4j.org/)
 | RNTNTweets          |           | Not working  | batch         |
 | RNTNTweets2         |           | Not working  | batch         |
 | TSNEBarnesHut       | NA        | Not working  | NA            |
-| TSNEStandard        | NA        | Working      | NA            |
+| TSNEStandard        | NA        | Not working  | NA            |
 | Word2VecRawText     | Sim 0     | Tune         | batch         |
     
 
