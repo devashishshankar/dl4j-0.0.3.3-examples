@@ -23,9 +23,13 @@ public class RNTNTweetsExample {
         List<String> lines = FileUtils.readLines(new ClassPathResource("sentiment-tweets-small.csv").getFile());
         List<String> sentences = new ArrayList<>();
         List<String> labels = new ArrayList<>();
+        int count = 0;
         for(String s : lines) {
-            labels.add(s.split(",")[2]);
-            sentences.add(s.split(",")[1]);
+            if (count > 0) {
+                labels.add(s.split(",")[1]);
+                sentences.add(s.split(",")[3]);
+            }
+            count++;
         }
 
         SentenceIterator iter = new CollectionSentenceIterator(sentences);
@@ -47,16 +51,20 @@ public class RNTNTweetsExample {
         TreeVectorizer trees = new TreeVectorizer();
         RNTN rntn = new RNTN.Builder().setActivationFunction("tanh")
                 .setAdagradResetFrequency(1)
-                .setCombineClassification(true).setFeatureVectors(vec)
+                .setCombineClassification(true)
+                .setFeatureVectors(vec)
                 .setRandomFeatureVectors(false)
-                .setUseTensors(false).build();
-        int count = 0;
+                .setUseTensors(false)
+                .build();
+        count = 0;
+
         while(iter.hasNext()) {
             String next = iter.nextSentence();
             List<Tree> treeList = trees.getTreesWithLabels(next, Arrays.asList(labels.get(count++)));
             rntn.fit(treeList);
         }
 
+        count = 0;
         iter.reset();
         RNTNEval eval = new RNTNEval();
         while(iter.hasNext()) {

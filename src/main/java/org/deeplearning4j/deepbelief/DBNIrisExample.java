@@ -71,7 +71,7 @@ public class DBNIrisExample {
                 .constrainGradientToUnitNorm(true)
                 .list(2)
                 .hiddenLayerSizes(3)
-                .override(1, new ClassifierOverride(1))
+                .override(1, new ClassifierOverride())
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();

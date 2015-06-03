@@ -69,7 +69,7 @@ public class DBNCreateDataExample {
                 .optimizationAlgo(OptimizationAlgorithm.ITERATION_GRADIENT_DESCENT)
                 .list(2)
                 .hiddenLayerSizes(400)
-                .override(1, new ClassifierOverride(3))
+                .override(1, new ClassifierOverride())
                 .build();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
