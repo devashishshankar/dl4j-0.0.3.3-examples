@@ -49,8 +49,6 @@ public class CNNMnistExample {
         log.info("Load data....");
         DataSetIterator mnistIter = new MnistDataSetIterator(100,1000);
 
-        log.info("Split data....");
-
         log.info("Build model....");
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .nIn(numRows * numColumns)

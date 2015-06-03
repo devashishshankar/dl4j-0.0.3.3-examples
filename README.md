@@ -27,7 +27,7 @@ For more information, check out [deeplearning4j.org](http://deeplearning4j.org/)
 |---------------------|-----------|--------------|---------------|
 | CNNIris             | F1 0.14   | Tune         | batch         |
 | CNNMnist            | F1 0.013  | Tune         | batch         |
-| CNNMnist2           | F1 0.06   | Tune         | batch         |
+| CNNMnist2           | F1 0.03   | Tune         | batch         |
 | DBNCreateData       | F1 0.33   | Tune         | batch         |          	
 | DBNFullMnist        | F1 0.18   | Tune         | full          |
 | DBNIris             | F1 0.15   | Tune         | full          |

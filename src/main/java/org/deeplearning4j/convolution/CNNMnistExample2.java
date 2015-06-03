@@ -1,14 +1,18 @@
 package org.deeplearning4j.convolution;
 
+import com.fasterxml.jackson.core.sym.Name3;
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
+import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
+import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
 import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
 import org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
 import org.deeplearning4j.nn.conf.override.ClassifierOverride;
 import org.deeplearning4j.nn.conf.override.ConfOverride;
+import org.deeplearning4j.nn.conf.rng.DefaultRandom;
 import org.deeplearning4j.nn.layers.convolution.preprocessor.ConvolutionInputPreProcessor;
 import org.deeplearning4j.nn.layers.convolution.preprocessor.ConvolutionPostProcessor;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
@@ -21,12 +25,17 @@ import org.kohsuke.args4j.Option;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.jblas.NDArray;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
+import org.nd4j.linalg.util.ArrayUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by willow on 5/11/15.
@@ -47,36 +56,36 @@ public class CNNMnistExample2 {
     int featureMapSize = 5;
 
     @Option(name="-learningRate", usage="learning rate")
-    private static double learningRate = 0.10;
-
-    @Option(name="-activate", usage="activation function")
-    private static String activationFunc="sigmoid";
-
-    @Option(name="-loss", usage="loss function")
-    private static LossFunctions.LossFunction lossFunc = LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD;
+    private static double learningRate = 0.13;
 
     @Option(name="-hLayerSize", usage="hidden layer size")
     private static int hLayerSize = 18;
 
+    @Option(name="-iterations", usage="number of iterations to train the layer")
+    private static int iterations = 20;
+
     private static double numTrainSamples = numSamples * 0.8;
     private static double numTestSamples = numSamples - numTrainSamples;
 
-    static DataSetIterator loadData(int numTrainSamples) throws Exception{
+    static DataSetIterator loadData(int batchSize, int numTrainSamples) throws Exception{
         //SamplingDataSetIterator - TODO make sure representation of each classification in each batch
         DataSetIterator dataIter = new MnistDataSetIterator(batchSize, numTrainSamples);
         return dataIter;
     }
 
     static MultiLayerNetwork buildModel(final int featureMapSize){
+        // Uniform and Zero have good results
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .nIn(numRows * numColumns)
                 .nOut(10)
                 .batchSize(batchSize)
-                .iterations(10)
+                .iterations(iterations)
                 .weightInit(WeightInit.ZERO)
-                .activationFunction(activationFunc)
-                .filterSize(batchSize, 1, numRows, numColumns)
-                .lossFunction(lossFunc).learningRate(learningRate)
+                .rng(new DefaultRandom(7))
+                .activationFunction("sigmoid")
+                .filterSize(8, 1, numRows, numColumns)
+                .lossFunction(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+                .learningRate(learningRate)
                 .optimizationAlgo(OptimizationAlgorithm.GRADIENT_DESCENT)
                 .constrainGradientToUnitNorm(true)
                 .list(3)
@@ -104,19 +113,23 @@ public class CNNMnistExample2 {
     }
 
     static MultiLayerNetwork trainModel(DataSetIterator data, MultiLayerNetwork model){
+        Nd4j.MAX_SLICES_TO_PRINT = 5;
+        Nd4j.MAX_ELEMENTS_PER_SLICE = 10;
         while (data.hasNext()){
             DataSet allData = data.next();
             allData.normalizeZeroMeanZeroUnitVariance();
+//            INDArray labels = allData.getLabels();
+//            log.info(labels.toString());
             model.fit(allData);
+
         }
         return model;
 
     }
 
-    static void evaluateModel(DataSetIterator testData, MultiLayerNetwork model){
+    static void evaluateModel(DataSetIterator data, MultiLayerNetwork model) {
         Evaluation eval = new Evaluation();
-        DataSet allTest = testData.next();
-
+        DataSet allTest = data.next();
         INDArray testInput = allTest.getFeatureMatrix();
         INDArray testLabels = allTest.getLabels();
         INDArray output = model.output(testInput);
@@ -125,6 +138,7 @@ public class CNNMnistExample2 {
     }
 
     public void exec(String[] args) throws Exception {
+
         CmdLineParser parser = new CmdLineParser(this);
         try {
             parser.parseArgument(args);
@@ -136,7 +150,7 @@ public class CNNMnistExample2 {
         }
 
         log.info("Load data....");
-        DataSetIterator dataIter = loadData((int) numTrainSamples);
+        DataSetIterator dataIter = loadData(batchSize, (int) numTrainSamples);
 
         log.info("Build model....");
         MultiLayerNetwork model = buildModel(featureMapSize);
@@ -145,7 +159,7 @@ public class CNNMnistExample2 {
         trainModel(dataIter, model);
 
         log.info("Evaluate model....");
-        DataSetIterator testData = loadData((int) numTestSamples);
+        DataSetIterator testData = loadData((int) numTestSamples, (int) numTestSamples);
         evaluateModel(testData, model);
 
         log.info("****************Example finished********************");
